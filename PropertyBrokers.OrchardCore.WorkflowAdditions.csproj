@@ -2,6 +2,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+	  <PackageId>PropertyBrokersDigital.OrchardCore.WorkflowAdditions</PackageId>
+	  <RepositoryType>git</RepositoryType>
+	  <RepositoryUrl>PropertyBrokersDigital/PropertyBrokers.OrchardCore.WorkflowAdditions</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
