@@ -1,0 +1,9 @@
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.UserForEach;
+@model UserForEachTaskViewModel
+
+<div class="form-group" asp-validation-class-for="Name">
+    <label asp-for="Name">@T["Name"]</label>
+    <input type="text" asp-for="Name" class="form-control" />
+    <span asp-validation-for="Name"></span>
+    <span class="hint">@T["Name of the task"]</span>
+</div>

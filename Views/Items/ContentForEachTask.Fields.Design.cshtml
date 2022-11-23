@@ -1,0 +1,6 @@
+﻿@model OrchardCore.Workflows.ViewModels.ActivityViewModel<PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach.ContentForEachTask>
+
+<header>
+    <h4><i class="fa fa-circle-o-notch"></i>@Model.Activity.GetTitleOrDefault(() => T["Content For Each"])</h4>
+</header>
+<em>@(Model.Activity.UseQuery ? $"Query: {Model.Activity.Query}" : $"ContentType: {Model.Activity.ContentType}")</em>
