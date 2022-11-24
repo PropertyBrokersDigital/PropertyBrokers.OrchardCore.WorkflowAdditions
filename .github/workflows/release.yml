@@ -22,8 +22,6 @@ jobs:
     - name: Pack
       run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
     - name: Push
-      run: dotnet nuget push PropertyBrokersDigital.OrchardCore.WorkflowAdditions.${VERSION}.nupkg --source https://nuget.pkg.github.com/PropertyBrokersDigital/index.json --api-key ${GITHUB_TOKEN}
+      run: dotnet nuget push PropertyBrokersDigital.OrchardCore.WorkflowAdditions.${VERSION}.nupkg --source https://nuget.pkg.github.com/PropertyBrokersDigital/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
     - name: Push
       run: dotnet nuget push PropertyBrokersDigital.OrchardCore.WorkflowAdditions.${VERSION}.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
