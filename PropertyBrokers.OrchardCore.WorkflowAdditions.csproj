@@ -4,7 +4,7 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 	  <PackageId>PropertyBrokersDigital.OrchardCore.WorkflowAdditions</PackageId>
 	  <RepositoryType>git</RepositoryType>
-	  <RepositoryUrl>PropertyBrokersDigital/PropertyBrokers.OrchardCore.WorkflowAdditions</RepositoryUrl>
+	  <RepositoryUrl>https://github.com/PropertyBrokersDigital/PropertyBrokers.OrchardCore.WorkflowAdditions</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
