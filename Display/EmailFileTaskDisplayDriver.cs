@@ -20,6 +20,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             model.AttachmentUrl = activity.AttachmentUrl.Expression;
             model.IsBodyHtml = activity.IsBodyHtml;
             model.IsBodyText = activity.IsBodyText;
+            model.SendWithNoAttachment = activity.SendWithNoAttachment;
             model.BccExpression = activity.Bcc.Expression;
             model.CcExpression = activity.Cc.Expression;
         }
@@ -38,6 +39,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             activity.IsBodyText = model.IsBodyText;
             activity.Bcc = new WorkflowExpression<string>(model.BccExpression);
             activity.Cc = new WorkflowExpression<string>(model.CcExpression);
+            activity.SendWithNoAttachment = model.SendWithNoAttachment; 
         }
     }
 }

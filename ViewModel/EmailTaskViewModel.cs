@@ -23,5 +23,6 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
         public string BodyText { get; set; }
         public bool IsBodyHtml { get; set; }
         public bool IsBodyText { get; set; }
+        public bool SendWithNoAttachment { get; set; }
     }
 }

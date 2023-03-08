@@ -97,6 +97,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
         }
+        public bool SendWithNoAttachment
+        {
+            get => GetProperty(() => true);
+            set => SetProperty(value);
+        }
 
         public bool IsBodyHtml
         {
@@ -120,14 +125,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             var attachmentUrl = await _expressionEvaluator.EvaluateAsync(AttachmentUrl, workflowContext, null);
             var request = new HttpRequestMessage(new HttpMethod("GET"), attachmentUrl);
             var response =  await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-            var fileName = response.Content.Headers.ContentDisposition.FileName;
-            response.EnsureSuccessStatusCode();
-            await using var ms = await response.Content.ReadAsStreamAsync();
-            var attachment = new MailMessageAttachment();
-            attachment.Stream = ms;
-            attachment.Filename = fileName;
             var attachments = new List<MailMessageAttachment>();
-            attachments.Add(attachment);
+
             var author = await _expressionEvaluator.EvaluateAsync(Author, workflowContext, null);
             var sender = await _expressionEvaluator.EvaluateAsync(Sender, workflowContext, null);
             var replyTo = await _expressionEvaluator.EvaluateAsync(ReplyTo, workflowContext, null);
@@ -136,37 +135,55 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             var bcc = await _expressionEvaluator.EvaluateAsync(Bcc, workflowContext, null);
             var subject = await _expressionEvaluator.EvaluateAsync(Subject, workflowContext, null);
             var body = await _expressionEvaluator.EvaluateAsync(Body, workflowContext, _htmlEncoder);
-
             var bodyText = await _expressionEvaluator.EvaluateAsync(BodyText, workflowContext, null);
-
             var message = new MailMessage
             {
                 // Author and Sender are both not required fields.
                 From = author?.Trim() ?? sender?.Trim(),
-                To = recipients.Trim(),
+                To = "mike@pb.co.nz",//recipients.Trim(),
                 Cc = cc?.Trim(),
                 Bcc = bcc?.Trim(),
                 // Email reply-to header https://tools.ietf.org/html/rfc4021#section-2.1.4
                 ReplyTo = replyTo?.Trim(),
                 Subject = subject.Trim(),
                 Body = body?.Trim(),
-                Attachments = attachments,
                 BodyText = bodyText?.Trim(),
                 IsBodyHtml = IsBodyHtml,
                 IsBodyText = IsBodyText
             };
-
             if (!String.IsNullOrWhiteSpace(sender))
             {
                 message.Sender = sender.Trim();
             }
-
-            var result = await _smtpService.SendAsync(message);
-            workflowContext.LastResult = result;
-
-            if (!result.Succeeded)
+            
+            if (response.Content.Headers.ContentDisposition != null)
             {
-                return Outcomes("Failed");
+                var fileName = response.Content.Headers.ContentDisposition.FileName;
+                response.EnsureSuccessStatusCode();
+                await using var ms = await response.Content.ReadAsStreamAsync();
+                var attachment = new MailMessageAttachment();
+                attachment.Stream = ms;
+                attachment.Filename = fileName;
+                attachments.Add(attachment);
+                message.Attachments = attachments;
+                
+                var result = await _smtpService.SendAsync(message);
+                workflowContext.LastResult = result;
+
+                if (!result.Succeeded)
+                {
+                    return Outcomes("Failed");
+                }
+            }
+            else if(SendWithNoAttachment)
+            {
+                var result = await _smtpService.SendAsync(message);
+                workflowContext.LastResult = result;
+
+                if (!result.Succeeded)
+                {
+                    return Outcomes("Failed");
+                }
             }
 
             return Outcomes("Done");
