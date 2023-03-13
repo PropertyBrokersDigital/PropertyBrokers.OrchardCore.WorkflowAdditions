@@ -12,6 +12,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
         {
             public const string ContentForEach = "PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach";
             public const string EmailFile = "PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile";
+            public const string MediaCachePurge = "PropertyBrokers.OrchardCore.WorkflowAdditions.MediaCachePurge";
         }
     }
 }

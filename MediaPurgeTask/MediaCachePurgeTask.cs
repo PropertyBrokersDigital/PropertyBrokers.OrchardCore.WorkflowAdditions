@@ -12,15 +12,15 @@ using OrchardCore.Workflows.Activities;
 using OrchardCore.Workflows.Models;
 using OrchardCore.Workflows.Services;
 
-namespace PropertyBrokers.OrchardCore.WorkflowAdditions.MediaPurge
+namespace PropertyBrokers.OrchardCore.WorkflowAdditions.MediaCachePurge
 {
-    public class MediaPurgeTask : TaskActivity
+    public class MediaCachePurgeTask : TaskActivity
     {
         private readonly IStringLocalizer S;
         private readonly IMediaFileStoreCache _mediaFileStoreCache;
 
-        public MediaPurgeTask(
-            IStringLocalizer<MediaPurgeTask> localizer,
+        public MediaCachePurgeTask(
+            IStringLocalizer<MediaCachePurgeTask> localizer,
             IServiceProvider serviceProvider
         )
         {
@@ -29,7 +29,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.MediaPurge
             S = localizer;
         }
 
-        public override string Name => nameof(MediaPurgeTask);
+        public override string Name => nameof(MediaCachePurgeTask);
         public override LocalizedString DisplayText => S["Media Purge Task"];
         public override LocalizedString Category => S["Media"];
 

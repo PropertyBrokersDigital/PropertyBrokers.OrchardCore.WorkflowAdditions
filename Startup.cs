@@ -7,7 +7,7 @@ using OrchardCore.Workflows.Helpers;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.UserForEach;
-using PropertyBrokers.OrchardCore.WorkflowAdditions.MediaPurge;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.MediaCachePurge;
 using System;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
@@ -17,10 +17,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
     {
         public override void ConfigureServices(IServiceCollection services)
         {
-            //services.AddActivity<ContentForEachTask, ContentForEachTaskDisplayDriver>();
+            services.AddActivity<ContentForEachTask, ContentForEachTaskDisplayDriver>();
             services.AddActivity<EmailFileTask, EmailFileTaskDisplayDriver>();
             services.AddActivity<UserForEachTask, UserForEachTaskDisplayDriver>();
-            services.AddActivity<MediaPurgeTask, MediaPurgeTaskDisplayDriver>();
+            services.AddActivity<MediaCachePurgeTask, MediaPurgeTaskDisplayDriver>();
             services.AddScoped<ISmtpService, SmtpService>();
 				}
 

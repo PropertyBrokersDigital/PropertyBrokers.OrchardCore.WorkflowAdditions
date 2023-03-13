@@ -23,3 +23,10 @@ using OrchardCore.Modules.Manifest;
     Dependencies = new[] { "OrchardCore.Workflows", "OrchardCore.Email" },
     Description = "Allows specifying a file attachment"
     )]
+[assembly: Feature(
+    Id = Constants.Features.MediaCachePurge,
+    Name = "Media cache purge",
+    Category = "Workflows",
+    Dependencies = new[] { "OrchardCore.Workflows", "OrchardCore.Media" },
+    Description = "Clear the media image cache"
+    )]

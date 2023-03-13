@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using OrchardCore.Contents.Workflows.Activities;
 using System.ComponentModel.DataAnnotations;
 
-namespace PropertyBrokers.OrchardCore.WorkflowAdditions.MediaPurge
+namespace PropertyBrokers.OrchardCore.WorkflowAdditions.MediaCachePurge
 {
 
     public class MediaPurgeTaskViewModel
