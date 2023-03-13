@@ -14,6 +14,7 @@
     <PackageReference Include="OrchardCore.DisplayManagement" Version="1.5.0" />
     <PackageReference Include="OrchardCore.Email" Version="1.5.0" />
     <PackageReference Include="OrchardCore.Email.Abstractions" Version="1.5.0" />
+    <PackageReference Include="OrchardCore.Media.Abstractions" Version="1.5.0" />
     <PackageReference Include="OrchardCore.Navigation" Version="1.5.0" />
     <PackageReference Include="OrchardCore.ResourceManagement" Version="1.5.0" />
     <PackageReference Include="OrchardCore.Module.Targets" Version="1.5.0" />
@@ -24,5 +25,9 @@
   
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\OrchardCore\src\OrchardCore\OrchardCore.Media.Abstractions\OrchardCore.Media.Abstractions.csproj" />
   </ItemGroup>
 </Project>
