@@ -13,7 +13,7 @@ using OrchardCore.Modules.Manifest;
     Id = Constants.Features.ContentForEach,
     Name = "Content foreach",
     Category = "Workflows",
-    Dependencies = new[] { "OrchardCore.Workflows"},
+    Dependencies = new[] { "OrchardCore.Workflows", "OrchardCore.Contents" },
     Description = "Allows looping through content (I.e. user registrations)"
     )]
 [assembly: Feature(

@@ -22,7 +22,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<UserForEachTask, UserForEachTaskDisplayDriver>();
             services.AddActivity<MediaCachePurgeTask, MediaPurgeTaskDisplayDriver>();
             services.AddScoped<ISmtpService, SmtpService>();
-				}
+        }
 
         public override void Configure(IApplicationBuilder app, IEndpointRouteBuilder routes, IServiceProvider serviceProvider)
         {
