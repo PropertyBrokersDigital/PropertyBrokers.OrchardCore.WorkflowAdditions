@@ -24,6 +24,13 @@ using OrchardCore.Modules.Manifest;
     Description = "Allows specifying a file attachment"
     )]
 [assembly: Feature(
+    Id = Constants.Features.UsersForEach,
+    Name = "User for each",
+    Category = "Workflows",
+    Dependencies = new[] { "OrchardCore.Workflows", "OrchardCore.Contents" },
+    Description = "Loop through users"
+    )]
+[assembly: Feature(
     Id = Constants.Features.MediaCachePurge,
     Name = "Media cache purge",
     Category = "Workflows",

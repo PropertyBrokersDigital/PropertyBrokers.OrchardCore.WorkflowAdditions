@@ -124,7 +124,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
         {
             var attachmentUrl = await _expressionEvaluator.EvaluateAsync(AttachmentUrl, workflowContext, null);
             var request = new HttpRequestMessage(new HttpMethod("GET"), attachmentUrl);
-            var response =  await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+              var response =  await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
             var attachments = new List<MailMessageAttachment>();
 
             var author = await _expressionEvaluator.EvaluateAsync(Author, workflowContext, null);
@@ -140,7 +140,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             {
                 // Author and Sender are both not required fields.
                 From = author?.Trim() ?? sender?.Trim(),
-                To = "mike@pb.co.nz",//recipients.Trim(),
+                To = recipients.Trim(),
                 Cc = cc?.Trim(),
                 Bcc = bcc?.Trim(),
                 // Email reply-to header https://tools.ietf.org/html/rfc4021#section-2.1.4
