@@ -23,7 +23,6 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson
     {
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly IStringLocalizer S;
-        private readonly ISession _session;
         public ValidateJsonTask(
             IWorkflowExpressionEvaluator expressionEvaluator,
             ISession session,
@@ -32,7 +31,6 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson
         {
             _expressionEvaluator = expressionEvaluator;
             S = localizer;
-            _session = session;
         }
 
         public override string Name => nameof(ValidateJsonTask);
