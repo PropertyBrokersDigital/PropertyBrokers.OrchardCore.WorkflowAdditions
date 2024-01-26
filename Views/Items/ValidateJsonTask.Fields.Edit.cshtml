@@ -1,0 +1,41 @@
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson;
+@model ValidateJsonTaskViewModel
+
+<div class="form-group" id="json-schema-content-id">
+    <label asp-for="SchemaContent">@T["JSON Schema"]</label>
+    <textarea asp-for="SchemaContent" rows="10" class="form-control"></textarea>
+    <span class="hint">@T["JSON Schema content, based on draft 4. With Liquid support."]</span>
+    <span class="hint"><a href="https://json-schema.org/draft-04/draft-zyp-json-schema-04" target="_blank">[spec]</a></span>
+</div>
+
+<div class="form-group" id="json-content">
+    <label asp-for="JsonContent">@T["JSON Content"]</label>
+    <textarea asp-for="JsonContent" rows="10" class="form-control"></textarea>
+    <span class="hint">@T["JSON Content to be validated. With Liquid support."]</span>
+</div>
+
+<style asp-name="codemirror"></style>
+<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror-mode-javascript" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-multiplex" at="Foot"></script>
+<script asp-name="codemirror-mode-xml" at="Foot"></script>
+<script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
+
+<script at="Foot">
+    $(function () {
+        var htmlBodyEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.SchemaContent)'), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: { name: "liquid" },
+        });
+
+        var textBodyEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.JsonContent)'), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: { name: "liquid" },
+        });
+    });
+</script>

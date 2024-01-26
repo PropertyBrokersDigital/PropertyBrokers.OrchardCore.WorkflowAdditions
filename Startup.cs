@@ -9,6 +9,8 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.UserForEach;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.MediaCachePurge;
 using System;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.Display;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
 {
@@ -21,6 +23,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<EmailFileTask, EmailFileTaskDisplayDriver>();
             services.AddActivity<UserForEachTask, UserForEachTaskDisplayDriver>();
             services.AddActivity<MediaCachePurgeTask, MediaPurgeTaskDisplayDriver>();
+            services.AddActivity<ValidateJsonTask, ValidateJsonTaskDisplayDriver>();
             services.AddScoped<ISmtpService, SmtpService>();
         }
 

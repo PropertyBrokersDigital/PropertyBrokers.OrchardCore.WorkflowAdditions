@@ -37,3 +37,10 @@ using OrchardCore.Modules.Manifest;
     Dependencies = new[] { "OrchardCore.Workflows", "OrchardCore.Media" },
     Description = "Clear the media image cache"
     )]
+[assembly: Feature(
+    Id = Constants.Features.ValidateJson,
+    Name = "Validate JSON",
+    Category = "Workflows",
+    Dependencies = new[] { "OrchardCore.Workflows" },
+    Description = "Validates JSON given a Schema"
+    )]
