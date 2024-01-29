@@ -16,6 +16,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             public const string UsersForEach = "PropertyBrokers.OrchardCore.WorkflowAdditions.UserForEach";
             public const string ValidateJson =
               "PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson";
+            public const string ProcessMjmlTemplate = "PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate";
         }
     }
 }

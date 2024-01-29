@@ -1,0 +1,6 @@
+﻿@model OrchardCore.Workflows.ViewModels.ActivityViewModel<PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate.ProcessMjmlTemplateTask>
+
+<header>
+    <h4><i class="fa fa-bolt"></i>@Model.Activity.GetTitleOrDefault(() => T["Process MJML Template"])</h4>
+</header>
+<em>@Model.Activity.Name</em>

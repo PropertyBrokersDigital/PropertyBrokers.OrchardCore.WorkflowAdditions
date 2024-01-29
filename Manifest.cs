@@ -44,3 +44,10 @@ using OrchardCore.Modules.Manifest;
     Dependencies = new[] { "OrchardCore.Workflows" },
     Description = "Validates JSON given a Schema"
     )]
+[assembly: Feature(
+    Id = Constants.Features.ProcessMjmlTemplate,
+    Name = "Process MJML Template",
+    Category = "Workflows",
+    Dependencies = new[] { "OrchardCore.Workflows" },
+    Description = "Processes an MJML template, merge tags can be optionally included"
+    )]
