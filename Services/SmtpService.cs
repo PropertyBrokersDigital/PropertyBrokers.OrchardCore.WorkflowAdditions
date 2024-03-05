@@ -189,10 +189,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
                     case SmtpEncryptionMethod.None:
                         secureSocketOptions = SecureSocketOptions.None;
                         break;
-                    case SmtpEncryptionMethod.SSLTLS:
+                    case SmtpEncryptionMethod.SslTls:
                         secureSocketOptions = SecureSocketOptions.SslOnConnect;
                         break;
-                    case SmtpEncryptionMethod.STARTTLS:
+                    case SmtpEncryptionMethod.StartTls:
                         secureSocketOptions = SecureSocketOptions.StartTls;
                         break;
                     default:
