@@ -11,6 +11,7 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.MediaCachePurge;
 using System;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.Display;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
 {
@@ -24,6 +25,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<UserForEachTask, UserForEachTaskDisplayDriver>();
             services.AddActivity<MediaCachePurgeTask, MediaPurgeTaskDisplayDriver>();
             services.AddActivity<ValidateJsonTask, ValidateJsonTaskDisplayDriver>();
+            services.AddActivity<ProcessMjmlTemplateTask, ProcessMjmlTemplateTaskDisplayDriver>();
             services.AddScoped<ISmtpService, SmtpService>();
         }
 

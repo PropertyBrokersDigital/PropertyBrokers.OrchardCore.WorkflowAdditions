@@ -1,0 +1,40 @@
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate;
+@model ProcessMjmlTemplateTaskViewModel
+
+<div class="form-group" id="email-template-content">
+    <label asp-for="EmailTemplateContent">@T["Email Template"]</label>
+    <textarea asp-for="EmailTemplateContent" rows="10" class="form-control"></textarea>
+    <span class="hint">@T["MJML email template content. With Liquid support."]</span>
+</div>
+
+<div class="form-group" id="merge-tags-content">
+    <label asp-for="MergeTagsContent">@T["Merge Tags"]</label>
+    <textarea asp-for="MergeTagsContent" rows="10" class="form-control"></textarea>
+    <span class="hint">@T["Merge tags to be parsed with the email template, in JSON. With Liquid support."]</span>
+</div>
+
+<style asp-name="codemirror"></style>
+<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror-mode-javascript" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-multiplex" at="Foot"></script>
+<script asp-name="codemirror-mode-xml" at="Foot"></script>
+<script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
+
+<script at="Foot">
+    $(function () {
+        var emailTemplateEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.EmailTemplateContent)'), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: { name: "liquid" },
+        });
+
+        var mergeTagsEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.MergeTagsContent)'), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: { name: "liquid" },
+        });
+    });
+</script>
