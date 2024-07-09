@@ -1,0 +1,6 @@
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalytics;
+@model ActivityViewModel<GoogleAnalyticsTask>
+
+<h4 class="card-title"><i class="fas fa-chart-line"></i>@Model.Activity.GetTitleOrDefault(() => T["Google Analytics"])</h4>
+
+<p class="text-muted">@T["Sends an event to Google Analytics."]</p>

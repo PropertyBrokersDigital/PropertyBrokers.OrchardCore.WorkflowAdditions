@@ -51,3 +51,9 @@ using OrchardCore.Modules.Manifest;
     Dependencies = new[] { "OrchardCore.Workflows" },
     Description = "Processes an MJML template, merge tags can be optionally included"
     )]
+[assembly: Feature(
+    Id = Constants.Features.GoogleAnalytics,
+    Name = "Google Analytics Workflow",
+    Description = "Adds Google Analytics integration to workflows.",
+    Category = "Analytics"
+)]
