@@ -1,0 +1,14 @@
+@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager;
+@model ActivityViewModel<GoogleTagManagerTask>
+
+<header>
+    <h4><i class="fa fa-tag" aria-hidden="true"></i>@Model.Activity.GetTitleOrDefault(() => T["Google Tag Manager"])</h4>
+</header>
+
+<span>@T["Send event to Google Tag Manager"]</span>
+
+<ul class="mt-2">
+    <li><strong>@T["Container ID:"]</strong> @Model.Activity.ContainerId</li>
+    <li><strong>@T["Event:"]</strong> @Model.Activity.EventExpression</li>
+    <li><strong>@T["Data Layer:"]</strong> @Model.Activity.DataLayerExpression</li>
+</ul>

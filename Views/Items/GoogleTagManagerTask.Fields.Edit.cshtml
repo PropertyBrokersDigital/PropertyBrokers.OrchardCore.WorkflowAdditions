@@ -1,0 +1,32 @@
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager;
+@model GoogleTagManagerTaskViewModel
+
+<div class="mb-3">
+    <label asp-for="ContainerId" class="form-label">@T["Container ID"]</label>
+    <input type="text" asp-for="ContainerId" class="form-control code" />
+    <span class="hint">@T["The Google Tag Manager Container ID (e.g., GTM-XXXXXXX)."]</span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="EventExpression" class="form-label">@T["Event Expression"]</label>
+    <input type="text" asp-for="EventExpression" class="form-control code" />
+    <span class="hint">@T["The expression to determine the event name. You can use workflow expressions here. Example: {{ Workflow.Input.FormName }}_submission"]</span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="DataLayerExpression" class="form-label">@T["Data Layer Expression"]</label>
+    <textarea asp-for="DataLayerExpression" class="form-control code" rows="10"></textarea>
+    <span class="hint">
+        @T["The expression to build the data layer object. You can use workflow expressions here. Example:"]
+        <pre><code>{
+                &quot;event&quot;: &quot;{{ Workflow.Input.FormName }}_submission&quot;,
+                &quot;form_id&quot;: &quot;{{ Workflow.Input.FormName }}&quot;,
+                &quot;form_url&quot;: &quot;{{ Workflow.Input.__RequestOriginatedFrom }}&quot;,
+                &quot;user_data&quot;: {
+                &quot;name&quot;: &quot;{{ Workflow.Input.FirstName }} {{ Workflow.Input.LastName }}&quot;,
+                &quot;email&quot;: &quot;{{ Workflow.Input.Email }}&quot;
+            }
+        }</code>
+        </pre>
+    </span>
+</div>
