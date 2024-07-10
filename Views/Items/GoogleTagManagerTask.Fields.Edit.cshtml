@@ -1,32 +1,76 @@
-﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager;
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
 @model GoogleTagManagerTaskViewModel
 
-<div class="mb-3">
-    <label asp-for="ContainerId" class="form-label">@T["Container ID"]</label>
-    <input type="text" asp-for="ContainerId" class="form-control code" />
-    <span class="hint">@T["The Google Tag Manager Container ID (e.g., GTM-XXXXXXX)."]</span>
+<div class="form-group" asp-validation-class-for="MeasurementId">
+    <label asp-for="MeasurementId">@T["Measurement ID"]</label>
+    <input type="text" asp-for="MeasurementId" class="form-control code" />
+    <span asp-validation-for="MeasurementId"></span>
+    <span class="hint">@T["The Measurement ID for your GA4 property (e.g., G-XXXXXXXXXX)."]</span>
 </div>
 
-<div class="mb-3">
-    <label asp-for="EventExpression" class="form-label">@T["Event Expression"]</label>
-    <input type="text" asp-for="EventExpression" class="form-control code" />
-    <span class="hint">@T["The expression to determine the event name. You can use workflow expressions here. Example: {{ Workflow.Input.FormName }}_submission"]</span>
+<div class="form-group" asp-validation-class-for="ApiSecret">
+    <label asp-for="ApiSecret">@T["API Secret"]</label>
+    <input type="password" asp-for="ApiSecret" class="form-control code" />
+    <span asp-validation-for="ApiSecret"></span>
+    <span class="hint">@T["The API Secret for your GA4 property."]</span>
 </div>
 
-<div class="mb-3">
-    <label asp-for="DataLayerExpression" class="form-label">@T["Data Layer Expression"]</label>
-    <textarea asp-for="DataLayerExpression" class="form-control code" rows="10"></textarea>
-    <span class="hint">
-        @T["The expression to build the data layer object. You can use workflow expressions here. Example:"]
-        <pre><code>{
-                &quot;event&quot;: &quot;{{ Workflow.Input.FormName }}_submission&quot;,
-                &quot;form_id&quot;: &quot;{{ Workflow.Input.FormName }}&quot;,
-                &quot;form_url&quot;: &quot;{{ Workflow.Input.__RequestOriginatedFrom }}&quot;,
-                &quot;user_data&quot;: {
-                &quot;name&quot;: &quot;{{ Workflow.Input.FirstName }} {{ Workflow.Input.LastName }}&quot;,
-                &quot;email&quot;: &quot;{{ Workflow.Input.Email }}&quot;
+<div class="form-group" asp-validation-class-for="ClientId">
+    <label asp-for="ClientId">@T["Client ID"]</label>
+    <input type="text" asp-for="ClientId" class="form-control code" />
+    <span asp-validation-for="ClientId"></span>
+    <span class="hint">@T["The Client ID for this event. Leave blank to generate automatically."]</span>
+</div>
+
+<div class="form-group" asp-validation-class-for="EventName">
+    <label asp-for="EventName">@T["Event Name"]</label>
+    <input type="text" asp-for="EventName" class="form-control code" />
+    <span asp-validation-for="EventName"></span>
+    <span class="hint">@T["The name of the event to send. You can use workflow expressions here."]</span>
+</div>
+
+<div class="form-group" asp-validation-class-for="EventParamsExpression">
+    <label asp-for="EventParamsExpression">@T["Event Parameters Expression"]</label>
+    <textarea asp-for="EventParamsExpression" rows="5" class="form-control code"></textarea>
+    <span asp-validation-for="EventParamsExpression"></span>
+    <span class="hint">@T["The expression to build the event parameters object. You can use workflow expressions here."]</span>
+</div>
+
+<style asp-name="codemirror"></style>
+<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror-mode-javascript" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-multiplex" at="Foot"></script>
+<script asp-name="codemirror-mode-xml" at="Foot"></script>
+<script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
+
+<script at="Foot">
+    $(function () {
+        var dataLayerEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.EventParamsExpression)'), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: { name: "javascript", json: true },
+        });
+
+        // Example of the data layer object
+        var exampleDataLayer = {
+            event: "{{ Workflow.Input.FormName }}_submission",
+            form_id: "{{ Workflow.Input.FormName }}",
+            form_url: "{{ Workflow.Input.__RequestOriginatedFrom }}",
+            user_data: {
+                name: "{{ Workflow.Input.FirstName }} {{ Workflow.Input.LastName }}",
+                email: "{{ Workflow.Input.Email }}"
             }
-        }</code>
-        </pre>
-    </span>
-</div>
+        };
+
+        // Add a button to insert the example
+        var exampleButton = $('<button type="button" class="btn btn-secondary mt-2">Insert Example</button>');
+        var buttonContainer = $('<div class="mb-5"></div>').append(exampleButton);  // Using Bootstrap's mb-5 for margin
+        $(dataLayerEditor.getWrapperElement()).after(buttonContainer);
+
+        exampleButton.on('click', function () {
+            dataLayerEditor.setValue(JSON.stringify(exampleDataLayer, null, 2));
+        });
+    });
+</script>

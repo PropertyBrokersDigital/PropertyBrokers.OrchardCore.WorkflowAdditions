@@ -6,49 +6,58 @@ using OrchardCore.Workflows.Activities;
 using OrchardCore.Workflows.Models;
 using OrchardCore.Workflows.Services;
 using Microsoft.Extensions.Localization;
-using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Text;
-using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
 {
     public class GoogleTagManagerTask : TaskActivity
     {
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IStringLocalizer S;
         private readonly HttpClient _httpClient;
+        private readonly IStringLocalizer S;
+
+        public override LocalizedString DisplayText => S["Google Analytics 4 Event"];
+        public override LocalizedString Category => S["Analytics"];
 
         public GoogleTagManagerTask(
             IWorkflowExpressionEvaluator expressionEvaluator,
-            IHttpContextAccessor httpContextAccessor,
-            IStringLocalizer<GoogleTagManagerTask> localizer,
-            HttpClient httpClient)
+            HttpClient httpClient,
+            IStringLocalizer<GoogleTagManagerTask> localizer)
         {
             _expressionEvaluator = expressionEvaluator;
-            _httpContextAccessor = httpContextAccessor;
-            S = localizer;
             _httpClient = httpClient;
+            S = localizer;
         }
 
         public override string Name => nameof(GoogleTagManagerTask);
-        public override LocalizedString DisplayText => S["Google Tag Manager Task"];
-        public override LocalizedString Category => S["Analytics"];
 
-        public WorkflowExpression<string> ContainerId
+        public WorkflowExpression<string> MeasurementId
         {
             get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
         }
 
-        public WorkflowExpression<string> EventExpression
+        public WorkflowExpression<string> ApiSecret
         {
             get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
         }
 
-        public WorkflowExpression<string> DataLayerExpression
+        public WorkflowExpression<string> ClientId
+        {
+            get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+        }
+
+        public WorkflowExpression<string> EventName
+        {
+            get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+        }
+
+        public WorkflowExpression<string> EventParamsExpression
         {
             get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
@@ -61,71 +70,70 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
 
         public override async Task<ActivityExecutionResult> ExecuteAsync(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
         {
-            var containerId = await _expressionEvaluator.EvaluateAsync(ContainerId, workflowContext, null);
-            var eventExpression = await _expressionEvaluator.EvaluateAsync(EventExpression, workflowContext, null);
-            var dataLayerExpression = await _expressionEvaluator.EvaluateAsync(DataLayerExpression, workflowContext, null);
-
-            if (string.IsNullOrEmpty(containerId))
-            {
-                workflowContext.LastResult = "Container ID is required";
-                return Outcomes("Error");
-            }
-
-            if (string.IsNullOrEmpty(eventExpression))
-            {
-                workflowContext.LastResult = "Event Expression is required";
-                return Outcomes("Error");
-            }
-
-            JObject dataLayer;
             try
             {
-                var evaluatedDataLayer = await _expressionEvaluator.EvaluateAsync(new WorkflowExpression<object>(dataLayerExpression), workflowContext, null);
-                dataLayer = JObject.FromObject(evaluatedDataLayer);
+                var measurementId = await _expressionEvaluator.EvaluateAsync(MeasurementId, workflowContext, null);
+                var apiSecret = await _expressionEvaluator.EvaluateAsync(ApiSecret, workflowContext, null);
+                var clientId = await _expressionEvaluator.EvaluateAsync(ClientId, workflowContext, null);
+                var eventName = await _expressionEvaluator.EvaluateAsync(EventName, workflowContext, null);
+                var eventParamsExpression = await _expressionEvaluator.EvaluateAsync(EventParamsExpression, workflowContext, null);
+
+                if (string.IsNullOrEmpty(measurementId) || string.IsNullOrEmpty(apiSecret))
+                {
+                    workflowContext.LastResult = S["Measurement ID and API Secret are required"].Value;
+                    return Outcomes("Error");
+                }
+
+                if (string.IsNullOrEmpty(eventName))
+                {
+                    workflowContext.LastResult = S["Event Name is required"].Value;
+                    return Outcomes("Error");
+                }
+
+                if (string.IsNullOrEmpty(clientId))
+                {
+                    clientId = Guid.NewGuid().ToString();
+                }
+
+                var eventParams = !string.IsNullOrEmpty(eventParamsExpression)
+                    ? await _expressionEvaluator.EvaluateAsync(new WorkflowExpression<object>(eventParamsExpression), workflowContext, null)
+                    : new object();
+
+                var payload = new
+                {
+                    client_id = clientId,
+                    events = new[]
+                    {
+                        new
+                        {
+                            name = eventName,
+                            @params = eventParams
+                        }
+                    }
+                };
+
+                var json = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var url = $"https://www.google-analytics.com/mp/collect?measurement_id={measurementId}&api_secret={apiSecret}";
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    workflowContext.LastResult = S["Successfully sent event '{0}' to GA4", eventName].Value;
+                    return Outcomes("Done");
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    workflowContext.LastResult = S["Failed to send event to GA4: {0}", response.StatusCode].Value;
+                    return Outcomes("Error");
+                }
             }
             catch (Exception ex)
             {
-                workflowContext.LastResult = $"Error evaluating data layer expression: {ex.Message}";
-                return Outcomes("Error");
-            }
-
-            var gtmUrl = $"https://www.googletagmanager.com/gtag/js?id={containerId}";
-            var dataLayerScript = $@"
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){{dataLayer.push(arguments);}}
-                gtag('js', new Date());
-                gtag('config', '{containerId}');
-                dataLayer.push({dataLayer.ToString(Newtonsoft.Json.Formatting.None)});
-                gtag('event', '{eventExpression}', {dataLayer.ToString(Newtonsoft.Json.Formatting.None)});
-            ";
-
-            var htmlContent = $@"
-                <html>
-                <head>
-                    <script async src='{gtmUrl}'></script>
-                    <script>
-                        {dataLayerScript}
-                    </script>
-                </head>
-                <body>
-                    <h1>GTM Event Fired</h1>
-                    <p>Event: {eventExpression}</p>
-                    <p>Data: {dataLayer.ToString(Newtonsoft.Json.Formatting.Indented)}</p>
-                </body>
-                </html>
-            ";
-
-            try
-            {
-                var content = new StringContent(htmlContent, Encoding.UTF8, "text/html");
-                var response = await _httpClient.PostAsync("https://www.googletagmanager.com/gtag/js", content);
-                response.EnsureSuccessStatusCode();
-                workflowContext.LastResult = $"GTM event '{eventExpression}' sent successfully with data: {dataLayer}";
-                return Outcomes("Done");
-            }
-            catch (Exception ex)
-            {
-                workflowContext.LastResult = $"Error sending GTM event: {ex.Message}";
+                workflowContext.LastResult = S["Error: {0}", ex.Message].Value;
                 return Outcomes("Error");
             }
         }

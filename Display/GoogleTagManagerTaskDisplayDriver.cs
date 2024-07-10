@@ -1,7 +1,5 @@
 ﻿using OrchardCore.Workflows.Display;
 using OrchardCore.Workflows.Models;
-using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager;
-
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
 {
@@ -9,16 +7,20 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
     {
         protected override void EditActivity(GoogleTagManagerTask activity, GoogleTagManagerTaskViewModel model)
         {
-            model.ContainerId = activity.ContainerId.Expression;
-            model.EventExpression = activity.EventExpression.Expression;
-            model.DataLayerExpression = activity.DataLayerExpression.Expression;
+            model.MeasurementId = activity.MeasurementId.Expression;
+            model.ApiSecret = activity.ApiSecret.Expression;
+            model.ClientId = activity.ClientId.Expression;
+            model.EventName = activity.EventName.Expression;
+            model.EventParamsExpression = activity.EventParamsExpression.Expression;
         }
 
         protected override void UpdateActivity(GoogleTagManagerTaskViewModel model, GoogleTagManagerTask activity)
         {
-            activity.ContainerId = new WorkflowExpression<string>(model.ContainerId);
-            activity.EventExpression = new WorkflowExpression<string>(model.EventExpression);
-            activity.DataLayerExpression = new WorkflowExpression<string>(model.DataLayerExpression);
+            activity.MeasurementId = new WorkflowExpression<string>(model.MeasurementId);
+            activity.ApiSecret = new WorkflowExpression<string>(model.ApiSecret);
+            activity.ClientId = new WorkflowExpression<string>(model.ClientId);
+            activity.EventName = new WorkflowExpression<string>(model.EventName);
+            activity.EventParamsExpression = new WorkflowExpression<string>(model.EventParamsExpression);
         }
     }
 }

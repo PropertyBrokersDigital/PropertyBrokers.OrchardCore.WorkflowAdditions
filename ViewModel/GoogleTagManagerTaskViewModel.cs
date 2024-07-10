@@ -1,16 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
+﻿namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
 {
     public class GoogleTagManagerTaskViewModel
     {
-        [Required]
-        public string ContainerId { get; set; }
-
-        [Required]
-        public string EventExpression { get; set; }
-
-        [Required]
-        public string DataLayerExpression { get; set; }
+        public string MeasurementId { get; set; }
+        public string ApiSecret { get; set; }
+        public string ClientId { get; set; }
+        public string EventName { get; set; }
+        public string EventParamsExpression { get; set; }
     }
 }
