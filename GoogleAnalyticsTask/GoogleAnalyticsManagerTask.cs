@@ -10,6 +10,8 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using Parlot.Fluent;
+using Fluid.Parser;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
 {
@@ -18,10 +20,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly HttpClient _httpClient;
         private readonly IStringLocalizer S;
+        private const string error = "Error";
 
         public override LocalizedString DisplayText => S["Google Analytics 4 Event"];
         public override LocalizedString Category => S["Analytics"];
-
         public GoogleAnalyticsManagerTask(
             IWorkflowExpressionEvaluator expressionEvaluator,
             HttpClient httpClient,
@@ -66,7 +68,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
 
         public override IEnumerable<Outcome> GetPossibleOutcomes(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
         {
-            return Outcomes(S["Done"], S["Error"]);
+            return Outcomes(S["Done"], S[error]);
         }
 
         public override async Task<ActivityExecutionResult> ExecuteAsync(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
@@ -82,13 +84,13 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
                 if (string.IsNullOrEmpty(measurementId) || string.IsNullOrEmpty(apiSecret))
                 {
                     workflowContext.LastResult = S["Measurement ID and API Secret are required"].Value;
-                    return Outcomes("Error");
+                    return Outcomes(error);
                 }
 
                 if (string.IsNullOrEmpty(eventName))
                 {
                     workflowContext.LastResult = S["Event Name is required"].Value;
-                    return Outcomes("Error");
+                    return Outcomes(error);
                 }
 
                 if (string.IsNullOrEmpty(clientId))
@@ -132,13 +134,13 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     workflowContext.LastResult = S["Failed to send event to GA4. Status: {0}, Error: {1}", response.StatusCode, errorMessage].Value;
-                    return Outcomes("Error");
+                    return Outcomes(error);
                 }
             }
             catch (Exception ex)
             {
                 workflowContext.LastResult = S["Error: {0}", ex.Message].Value;
-                return Outcomes("Error");
+                return Outcomes(error);
             }
         }
     }
