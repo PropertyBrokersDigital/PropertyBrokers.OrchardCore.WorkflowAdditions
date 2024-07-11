@@ -2,35 +2,35 @@
 @model GoogleAnalyticsTaskViewModel
 
 <div class="form-group" asp-validation-class-for="MeasurementId">
-    <label asp-for="MeasurementId" class="form-label">@T["Measurement ID"]</label>
-    <input type="text" asp-for="MeasurementId" class="form-control code" />
+    <label for="MeasurementId" class="form-label">@T["Measurement ID"]</label>
+    <input asp-for="MeasurementId" class="form-control code" />
     <span asp-validation-for="MeasurementId" class="text-danger"></span>
     <span class="hint">@T["The Measurement ID for your GA4 property (e.g., G-XXXXXXXXXX)."]</span>
 </div>
 
 <div class="form-group" asp-validation-class-for="ApiSecret">
-    <label asp-for="ApiSecret" class="form-label">@T["API Secret"]</label>
-    <input type="password" asp-for="ApiSecret" class="form-control code" autocomplete="off" />
+    <label for="ApiSecret" class="form-label">@T["API Secret"]</label>
+    <input asp-for="ApiSecret" type="password" class="form-control code" autocomplete="off" />
     <span asp-validation-for="ApiSecret" class="text-danger"></span>
     <span class="hint">@T["The API Secret for your GA4 property. Keep this confidential."]</span>
 </div>
 
 <div class="form-group" asp-validation-class-for="ClientId">
-    <label asp-for="ClientId" class="form-label">@T["Client ID"]</label>
-    <input type="text" asp-for="ClientId" class="form-control code" />
+    <label for="ClientId" class="form-label">@T["Client ID"]</label>
+    <input asp-for="ClientId" type="text" class="form-control code" />
     <span asp-validation-for="ClientId" class="text-danger"></span>
     <span class="hint">@T["The Client ID for this event. Leave blank to generate automatically."]</span>
 </div>
 
 <div class="form-group" asp-validation-class-for="EventName">
-    <label asp-for="EventName" class="form-label">@T["Event Name"]</label>
-    <input type="text" asp-for="EventName" class="form-control code" />
+    <label for="EventName" class="form-label">@T["Event Name"]</label>
+    <input asp-for="EventName" type="text" class="form-control code" />
     <span asp-validation-for="EventName" class="text-danger"></span>
     <span class="hint">@T["The name of the event to send. You can use workflow expressions here."]</span>
 </div>
 
 <div class="form-group" asp-validation-class-for="EventParamsExpression">
-    <label asp-for="EventParamsExpression" class="form-label">@T["Event Parameters Expression"]</label>
+    <label for="EventParamsExpression" class="form-label">@T["Event Parameters Expression"]</label>
     <span class="hint">@T["The expression to build the event parameters object. You can use workflow expressions here. Matching the event in GA will yield best results."]</span>
     <textarea asp-for="EventParamsExpression" rows="5" class="form-control code"></textarea>
     <span asp-validation-for="EventParamsExpression" class="text-danger"></span>
