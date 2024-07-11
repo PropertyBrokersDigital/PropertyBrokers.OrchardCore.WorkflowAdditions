@@ -1,6 +1,6 @@
-﻿namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
+﻿namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
 {
-    public class GoogleTagManagerTaskViewModel
+    public class GoogleAnalyticsTaskViewModel
     {
         public string MeasurementId { get; set; }
         public string ApiSecret { get; set; }

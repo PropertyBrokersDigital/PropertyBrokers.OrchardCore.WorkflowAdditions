@@ -12,7 +12,7 @@ using System;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.Display;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate;
-using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
 {
@@ -27,7 +27,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<MediaCachePurgeTask, MediaPurgeTaskDisplayDriver>();
             services.AddActivity<ValidateJsonTask, ValidateJsonTaskDisplayDriver>();
             services.AddActivity<ProcessMjmlTemplateTask, ProcessMjmlTemplateTaskDisplayDriver>();
-            services.AddActivity<GoogleTagManagerTask, GoogleTagManagerTaskDisplayDriver>();
+            services.AddActivity<GoogleAnalyticsManagerTask, GoogleAnalyticsTaskDisplayDriver>();
             services.AddScoped<ISmtpService, SmtpService>();
         }
 

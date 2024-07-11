@@ -1,5 +1,5 @@
-﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
-@model GoogleTagManagerTaskViewModel
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
+@model GoogleAnalyticsTaskViewModel
 
 <div class="form-group" asp-validation-class-for="MeasurementId">
     <label asp-for="MeasurementId">@T["Measurement ID"]</label>
@@ -10,7 +10,7 @@
 
 <div class="form-group" asp-validation-class-for="ApiSecret">
     <label asp-for="ApiSecret">@T["API Secret"]</label>
-    <input type="password" asp-for="ApiSecret" class="form-control code" />
+    <input type="text" asp-for="ApiSecret" class="form-control code" />
     <span asp-validation-for="ApiSecret"></span>
     <span class="hint">@T["The API Secret for your GA4 property."]</span>
 </div>
@@ -31,9 +31,9 @@
 
 <div class="form-group" asp-validation-class-for="EventParamsExpression">
     <label asp-for="EventParamsExpression">@T["Event Parameters Expression"]</label>
+    <span class="hint">@T["<br/>The expression to build the event parameters object. You can use workflow expressions here. Matching the event in GA will yield best results."]</span>
     <textarea asp-for="EventParamsExpression" rows="5" class="form-control code"></textarea>
     <span asp-validation-for="EventParamsExpression"></span>
-    <span class="hint">@T["The expression to build the event parameters object. You can use workflow expressions here."]</span>
 </div>
 
 <style asp-name="codemirror"></style>
@@ -53,24 +53,27 @@
             mode: { name: "javascript", json: true },
         });
 
-        // Example of the data layer object
-        var exampleDataLayer = {
-            event: "{{ Workflow.Input.FormName }}_submission",
-            form_id: "{{ Workflow.Input.FormName }}",
-            form_url: "{{ Workflow.Input.__RequestOriginatedFrom }}",
-            user_data: {
-                name: "{{ Workflow.Input.FirstName }} {{ Workflow.Input.LastName }}",
-                email: "{{ Workflow.Input.Email }}"
-            }
+        // Example of the event parameters object
+        var exampleEventParams = {
+            form_id: "{{ Workflow.Properties.Form_Name }}",
+            agent_id: "{{ Workflow.Properties.Agent_Id }}",
+            branch_id: "{{ Workflow.Properties.Branch_Id }}",
+            enquiry_type: "{{ Workflow.Properties.Enquiry_Type }}",
+            property_reference: "{{ Workflow.Properties.Listing_Reference }}",
+            page_url: "{{ Workflow.Properties.__Referring_Page }}",
+            timestamp: "{{ 'Now' | date: 'o' }}"
         };
 
-        // Add a button to insert the example
+        // Create button and container
         var exampleButton = $('<button type="button" class="btn btn-secondary mt-2">Insert Example</button>');
-        var buttonContainer = $('<div class="mb-5"></div>').append(exampleButton);  // Using Bootstrap's mb-5 for margin
+        var buttonContainer = $('<div class="mb-5"></div>').append(exampleButton);
+
+        // Add container after the editor
         $(dataLayerEditor.getWrapperElement()).after(buttonContainer);
 
+        // Button click event
         exampleButton.on('click', function () {
-            dataLayerEditor.setValue(JSON.stringify(exampleDataLayer, null, 2));
+            dataLayerEditor.setValue(JSON.stringify(exampleEventParams, null, 2));
         });
     });
 </script>

@@ -1,11 +1,11 @@
 ﻿using OrchardCore.Workflows.Display;
 using OrchardCore.Workflows.Models;
 
-namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
+namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
 {
-    public class GoogleTagManagerTaskDisplayDriver : ActivityDisplayDriver<GoogleTagManagerTask, GoogleTagManagerTaskViewModel>
+    public class GoogleAnalyticsTaskDisplayDriver : ActivityDisplayDriver<GoogleAnalyticsManagerTask, GoogleAnalyticsTaskViewModel>
     {
-        protected override void EditActivity(GoogleTagManagerTask activity, GoogleTagManagerTaskViewModel model)
+        protected override void EditActivity(GoogleAnalyticsManagerTask activity, GoogleAnalyticsTaskViewModel model)
         {
             model.MeasurementId = activity.MeasurementId.Expression;
             model.ApiSecret = activity.ApiSecret.Expression;
@@ -14,7 +14,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
             model.EventParamsExpression = activity.EventParamsExpression.Expression;
         }
 
-        protected override void UpdateActivity(GoogleTagManagerTaskViewModel model, GoogleTagManagerTask activity)
+        protected override void UpdateActivity(GoogleAnalyticsTaskViewModel model, GoogleAnalyticsManagerTask activity)
         {
             activity.MeasurementId = new WorkflowExpression<string>(model.MeasurementId);
             activity.ApiSecret = new WorkflowExpression<string>(model.ApiSecret);

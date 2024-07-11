@@ -9,10 +9,11 @@ using Microsoft.Extensions.Localization;
 using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
-namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
+namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
 {
-    public class GoogleTagManagerTask : TaskActivity
+    public class GoogleAnalyticsManagerTask : TaskActivity
     {
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly HttpClient _httpClient;
@@ -21,17 +22,17 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
         public override LocalizedString DisplayText => S["Google Analytics 4 Event"];
         public override LocalizedString Category => S["Analytics"];
 
-        public GoogleTagManagerTask(
+        public GoogleAnalyticsManagerTask(
             IWorkflowExpressionEvaluator expressionEvaluator,
             HttpClient httpClient,
-            IStringLocalizer<GoogleTagManagerTask> localizer)
+            IStringLocalizer<GoogleAnalyticsManagerTask> localizer)
         {
             _expressionEvaluator = expressionEvaluator;
             _httpClient = httpClient;
             S = localizer;
         }
 
-        public override string Name => nameof(GoogleTagManagerTask);
+        public override string Name => nameof(GoogleAnalyticsManagerTask);
 
         public WorkflowExpression<string> MeasurementId
         {
@@ -95,9 +96,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
                     clientId = Guid.NewGuid().ToString();
                 }
 
-                var eventParams = !string.IsNullOrEmpty(eventParamsExpression)
-                    ? await _expressionEvaluator.EvaluateAsync(new WorkflowExpression<object>(eventParamsExpression), workflowContext, null)
-                    : new object();
+                var eventParams = JsonConvert.DeserializeObject<Dictionary<string, object>>(eventParamsExpression);
+                if (!eventParams.ContainsKey("event"))
+                {
+                    eventParams["event"] = eventName;
+                }
 
                 var payload = new
                 {
@@ -113,21 +116,22 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager
                 };
 
                 var json = JsonConvert.SerializeObject(payload);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+                var content = new ByteArrayContent(Encoding.UTF8.GetBytes(json));
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
                 var url = $"https://www.google-analytics.com/mp/collect?measurement_id={measurementId}&api_secret={apiSecret}";
 
                 var response = await _httpClient.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    workflowContext.LastResult = S["Successfully sent event '{0}' to GA4", eventName].Value;
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    workflowContext.LastResult = S["Successfully sent event '{0}' to GA4. Status: {1}, Response: {2}", eventName, response.StatusCode, responseContent].Value;
                     return Outcomes("Done");
                 }
                 else
                 {
                     var errorMessage = await response.Content.ReadAsStringAsync();
-                    workflowContext.LastResult = S["Failed to send event to GA4: {0}", response.StatusCode].Value;
+                    workflowContext.LastResult = S["Failed to send event to GA4. Status: {0}, Error: {1}", response.StatusCode, errorMessage].Value;
                     return Outcomes("Error");
                 }
             }
