@@ -1,0 +1,15 @@
+﻿@model PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.ViewModels.GenerateSecureUrlTokenTaskViewModel
+
+<div class="mb-3" asp-validation-class-for="Email">
+    <label asp-for="Email">@T["Email"]</label>
+    <input type="text" asp-for="Email" class="form-control" />
+    <span asp-validation-for="Email"></span>
+    <span class="hint">@T["The email address for which to generate the token. With Liquid support, e.g. {{ User.Email }}"]</span>
+</div>
+
+<div class="mb-3" asp-validation-class-for="ValidityInHours">
+    <label asp-for="ValidityInHours">@T["Validity (in hours)"]</label>
+    <input type="number" asp-for="ValidityInHours" class="form-control" />
+    <span asp-validation-for="ValidityInHours"></span>
+    <span class="hint">@T["The number of hours the token will be valid for. With Liquid support, e.g. {{ 24 | Times: 7 }} for 7 days"]</span>
+</div>

@@ -1,0 +1,7 @@
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken
+@using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.ViewModels;
+@model ActivityViewModel<GenerateSecureUrlTokenTask>
+
+<h4 class="card-title"><i class="fas fa-key"></i>@Model.Activity.GetTitleOrDefault(() => T["Generate Secure URL Token"])</h4>
+
+<p>@T["Generates a secure URL token for {0}", Model.Activity.Email]</p>

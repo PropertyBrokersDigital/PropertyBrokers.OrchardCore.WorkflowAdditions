@@ -51,3 +51,10 @@ using OrchardCore.Modules.Manifest;
     Dependencies = new[] { "OrchardCore.Workflows" },
     Description = "Processes an MJML template, merge tags can be optionally included"
     )]
+[assembly: Feature(
+    Id = Constants.Features.GenerateSecureUrlToken,
+    Name = "Generate secure URL",
+    Category = "Workflows",
+    Dependencies = new[] { "OrchardCore.Workflows" },
+    Description = "Creates a hash for a secure URL"
+    )]
