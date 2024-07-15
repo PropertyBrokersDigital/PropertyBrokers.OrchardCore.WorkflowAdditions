@@ -58,3 +58,9 @@ using OrchardCore.Modules.Manifest;
     Dependencies = new[] { "OrchardCore.Workflows" },
     Description = "Creates a hash for a secure URL"
     )]
+[assembly: Feature(
+    Id = Constants.Features.GoogleTagManager,
+    Name = "Google Tag Manager Workflow",
+    Description = "Adds Google Tag Manager integration to workflows.",
+    Category = "Analytics"
+)]

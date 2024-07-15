@@ -1,0 +1,15 @@
+@using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
+@model ActivityViewModel<GoogleAnalyticsManagerTask>
+
+<header>
+    <h4><i class="fa fa-chart-line" aria-hidden="true"></i>@Model.Activity.GetTitleOrDefault(() => T["Google Analytics 4 Event"])</h4>
+</header>
+
+<span>@T["Send event to Google Analytics 4"]</span>
+
+<ul class="mt-2">
+    <li><strong>@T["Measurement ID:"]</strong> @Model.Activity.MeasurementId.Expression</li>
+    <li><strong>@T["Event Name:"]</strong> @Model.Activity.EventName.Expression</li>
+    <li><strong>@T["Client ID:"]</strong> @(string.IsNullOrEmpty(Model.Activity.ClientId.Expression) ? T["Auto-generated"] : Model.Activity.ClientId.Expression)</li>
+    <li><strong>@T["Event Parameters:"]</strong> @(string.IsNullOrEmpty(Model.Activity.EventParamsExpression.Expression) ? T["None"] : T["Set"])</li>
+</ul>

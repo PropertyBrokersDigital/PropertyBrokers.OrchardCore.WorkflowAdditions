@@ -14,10 +14,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             public const string EmailFile = "PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile";
             public const string MediaCachePurge = "PropertyBrokers.OrchardCore.WorkflowAdditions.MediaCachePurge";
             public const string UsersForEach = "PropertyBrokers.OrchardCore.WorkflowAdditions.UserForEach";
-            public const string ValidateJson =
-              "PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson";
+            public const string ValidateJson = "PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson";
             public const string ProcessMjmlTemplate = "PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate";
             public const string GenerateSecureUrlToken = "PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken";
+            public const string GoogleTagManager = "PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager";
         }
     }
 }
