@@ -59,6 +59,13 @@ using OrchardCore.Modules.Manifest;
     Description = "Creates a hash for a secure URL"
     )]
 [assembly: Feature(
+    Id = Constants.Features.SaveFileToMedia,
+    Name = "Save file to media",
+    Category = "Workflows",
+    Dependencies = new[] { "OrchardCore.Workflows" },
+    Description = "Saves a file from a url to media"
+    )]
+[assembly: Feature(
     Id = Constants.Features.GoogleTagManager,
     Name = "Google Tag Manager Workflow",
     Description = "Adds Google Tag Manager integration to workflows.",

@@ -6,7 +6,7 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.ViewM
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.Drivers
 {
-    public class GenerateSecureUrlTokenTaskDisplay : ActivityDisplayDriver<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskViewModel>
+    public class GenerateSecureUrlTokenTaskDisplayDriver : ActivityDisplayDriver<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskViewModel>
     {
         protected override void EditActivity(GenerateSecureUrlTokenTask source, GenerateSecureUrlTokenTaskViewModel model)
         {

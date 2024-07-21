@@ -17,6 +17,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             public const string ValidateJson = "PropertyBrokers.OrchardCore.WorkflowAdditions.ValidateJson";
             public const string ProcessMjmlTemplate = "PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate";
             public const string GenerateSecureUrlToken = "PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken";
+            public const string SaveFileToMedia = "PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia";
             public const string GoogleTagManager = "PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager";
         }
     }

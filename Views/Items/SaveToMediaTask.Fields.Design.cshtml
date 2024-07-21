@@ -1,0 +1,6 @@
+﻿@model OrchardCore.Workflows.ViewModels.ActivityViewModel<PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia.SaveToMediaTask>
+
+<header>
+    <h4><i class="fa fa-bolt"></i>@Model.Activity.GetTitleOrDefault(() => T["User For Each"])</h4>
+</header>
+<em>@Model.Activity.Name</em>

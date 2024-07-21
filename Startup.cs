@@ -16,6 +16,7 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.Drive
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.Services;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
 {
@@ -33,7 +34,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<GoogleAnalyticsManagerTask, GoogleAnalyticsTaskDisplayDriver>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<ISecureUrlTokenService, SecureUrlTokenService>();
-            services.AddActivity<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskDisplay>();
+            services.AddActivity<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskDisplayDriver>();
+            services.AddActivity<SaveToMediaTask, SaveToMediaTaskDisplayDriver>();
 
         }
 
