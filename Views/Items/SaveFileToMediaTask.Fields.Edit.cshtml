@@ -1,11 +1,7 @@
-﻿@{
-    var test = Model;
-    var test1 = 1;
-}
-@model PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia.SaveToMediaTaskViewModel
-
+﻿@using PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia
+@model SaveFileToMediaTaskViewModel
 <header>
-    <h4><i class="fa fa-save"></i>T["Save To Media"])</h4>
+    <h4><i class="fa fa-save"></i> @T["Save To Media"]</h4>
 </header>
 
 <fieldset class="form-group" asp-validation-class-for="FileUrl">
@@ -21,11 +17,9 @@
     <span asp-validation-for="MediaPath"></span>
     <span class="hint">@T["The path in the media library where the file should be saved. With Liquid support."]</span>
 </fieldset>
-
-<fieldset class="form-group">
-    <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" asp-for="SaveWithNoFile" />
-        <label class="custom-control-label" asp-for="SaveWithNoFile">@T["Save with no file"]</label>
-    </div>
-    <span class="hint">@T["Check if you want the task to succeed even if no file is found."]</span>
+<fieldset class="form-group" asp-validation-class-for="MediaPath">
+    <label asp-for="FileName">@T["File Name"]</label>
+    <input type="text" asp-for="FileName" class="form-control code" />
+    <span asp-validation-for="FileName"></span>
+    <span class="hint">@T["The file name that should be saved. With Liquid support, optional with use the returned name from controller otherwise."]</span>
 </fieldset>

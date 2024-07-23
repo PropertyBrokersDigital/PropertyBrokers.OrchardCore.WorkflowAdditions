@@ -35,7 +35,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<ISecureUrlTokenService, SecureUrlTokenService>();
             services.AddActivity<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskDisplayDriver>();
-            services.AddActivity<SaveToMediaTask, SaveToMediaTaskDisplayDriver>();
+            services.AddActivity<SaveFileToMediaTask, SaveFileToMediaTaskDisplayDriver>();
 
         }
 

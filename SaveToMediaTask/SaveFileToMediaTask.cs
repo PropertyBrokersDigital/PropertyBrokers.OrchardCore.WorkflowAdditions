@@ -13,7 +13,7 @@ using OrchardCore.Workflows.Services;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia
 {
-    public class SaveToMediaTask : TaskActivity
+    public class SaveFileToMediaTask : TaskActivity
     {
         private readonly IMediaFileStore _mediaFileStore;
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
@@ -21,11 +21,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia
         private readonly IStringLocalizer S;
         private static readonly HttpClient _httpClient = new HttpClient();
 
-        public SaveToMediaTask(
+        public SaveFileToMediaTask(
             IMediaFileStore mediaFileStore,
             IWorkflowExpressionEvaluator expressionEvaluator,
             IMediaNameNormalizerService mediaNameNormalizerService,
-            IStringLocalizer<SaveToMediaTask> localizer)
+            IStringLocalizer<SaveFileToMediaTask> localizer)
         {
             _mediaFileStore = mediaFileStore;
             _expressionEvaluator = expressionEvaluator;
@@ -33,7 +33,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia
             S = localizer;
         }
 
-        public override string Name => nameof(SaveToMediaTask);
+        public override string Name => nameof(SaveFileToMediaTask);
         public override LocalizedString DisplayText => S["Save To Media Task"];
         public override LocalizedString Category => S["Media"];
 
@@ -48,6 +48,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia
             get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
         }
+        public WorkflowExpression<string> FileName
+        {
+            get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+        }
 
         public override IEnumerable<Outcome> GetPossibleOutcomes(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
         {
@@ -58,6 +63,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia
         {
             var fileUrl = await _expressionEvaluator.EvaluateAsync(FileUrl, workflowContext, null);
             var mediaPath = await _expressionEvaluator.EvaluateAsync(MediaPath, workflowContext, null);
+            var fileName = await _expressionEvaluator.EvaluateAsync(FileName, workflowContext, null);
 
             if (string.IsNullOrWhiteSpace(fileUrl) || string.IsNullOrWhiteSpace(mediaPath))
             {
@@ -73,12 +79,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia
 
                 if (response.Content.Headers.ContentDisposition != null)
                 {
-                    var fileName = response.Content.Headers.ContentDisposition.FileName?.Trim('"');
                     if (string.IsNullOrEmpty(fileName))
                     {
                         fileName = Path.GetFileName(fileUrl);
                     }
-
                     var normalisedFileName = _mediaNameNormalizerService.NormalizeFileName(fileName.Replace("/", " "));
                     var filePath = _mediaFileStore.Combine(mediaPath, normalisedFileName);
 

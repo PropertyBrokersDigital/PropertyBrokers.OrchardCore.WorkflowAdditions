@@ -1,0 +1,6 @@
+﻿@model OrchardCore.Workflows.ViewModels.ActivityViewModel<PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia.SaveFileToMediaTask>
+
+<header>
+    <h4><i class="fa fa-save"></i>@Model.Activity.GetTitleOrDefault(() => T["Save file to media store"])</h4>
+</header>
+<em>@Model.Activity.Name</em>
