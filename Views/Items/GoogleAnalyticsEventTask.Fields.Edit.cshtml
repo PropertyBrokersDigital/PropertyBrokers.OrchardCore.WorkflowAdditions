@@ -10,7 +10,7 @@
 
 <div class="form-group" asp-validation-class-for="ApiSecret">
     <label for="ApiSecret" class="form-label">@T["API Secret"]</label>
-    <input asp-for="ApiSecret" type="password" class="form-control code" autocomplete="off" />
+    <input asp-for="ApiSecret" type="text" class="form-control code" autocomplete="off" />
     <span asp-validation-for="ApiSecret" class="text-danger"></span>
     <span class="hint">@T["The API Secret for your GA4 property. Keep this confidential."]</span>
 </div>
