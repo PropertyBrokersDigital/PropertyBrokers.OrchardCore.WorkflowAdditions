@@ -13,9 +13,9 @@ using System.Net.Http.Headers;
 using Parlot.Fluent;
 using Fluid.Parser;
 
-namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
+namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
 {
-    public class GoogleAnalyticsManagerTask : TaskActivity
+    public class GoogleAnalyticsEventTask : TaskActivity
     {
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly HttpClient _httpClient;
@@ -24,17 +24,17 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager
 
         public override LocalizedString DisplayText => S["Google Analytics 4 Event"];
         public override LocalizedString Category => S["Analytics"];
-        public GoogleAnalyticsManagerTask(
+        public GoogleAnalyticsEventTask(
             IWorkflowExpressionEvaluator expressionEvaluator,
             HttpClient httpClient,
-            IStringLocalizer<GoogleAnalyticsManagerTask> localizer)
+            IStringLocalizer<GoogleAnalyticsEventTask> localizer)
         {
             _expressionEvaluator = expressionEvaluator;
             _httpClient = httpClient;
             S = localizer;
         }
 
-        public override string Name => nameof(GoogleAnalyticsManagerTask);
+        public override string Name => nameof(GoogleAnalyticsEvent);
 
         public WorkflowExpression<string> MeasurementId
         {

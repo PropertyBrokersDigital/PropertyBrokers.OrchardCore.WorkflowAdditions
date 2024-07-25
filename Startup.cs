@@ -15,7 +15,7 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.Drivers;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.Services;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken;
-using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsManager;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
@@ -31,7 +31,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<MediaCachePurgeTask, MediaPurgeTaskDisplayDriver>();
             services.AddActivity<ValidateJsonTask, ValidateJsonTaskDisplayDriver>();
             services.AddActivity<ProcessMjmlTemplateTask, ProcessMjmlTemplateTaskDisplayDriver>();
-            services.AddActivity<GoogleAnalyticsManagerTask, GoogleAnalyticsTaskDisplayDriver>();
+            services.AddActivity<GoogleAnalyticsEventTask, GoogleAnalyticsEventTaskDisplayDriver>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<ISecureUrlTokenService, SecureUrlTokenService>();
             services.AddActivity<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskDisplayDriver>();
