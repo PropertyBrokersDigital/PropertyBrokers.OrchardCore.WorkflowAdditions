@@ -10,16 +10,20 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
         public bool QueriesEnabled { get; set; }
         public bool UseQuery { get; set; }
         public string ContentType { get; set; }
+        public string QuerySource { get; set; }
         public string Query { get; set; }
         public string Parameters { get; set; }
         public bool PublishedOnly { get; set; }
-        public int Take { get; set; }
+        public int PageSize { get; set; }
 
         [BindNever]
         public IList<SelectListItem> AvailableContentTypes { get; set; }
 
         [BindNever]
-        public IList<SelectListItem> Queries { get; set; }
+        public List<SelectListItem> QuerySources { get; set; }
+
+        [BindNever]
+        public Dictionary<string, List<SelectListItem>> QueriesBySource { get; set; }
     }
 
 }
