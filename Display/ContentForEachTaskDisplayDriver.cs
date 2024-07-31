@@ -65,7 +65,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
         {
             activity.UseQuery = model.UseQuery;
             activity.ContentType = model.ContentType;
-            activity.Query = model.Query;
+            activity.Query = model.Query ?? string.Empty;
             activity.QuerySource = model.QuerySource;
             activity.Parameters = model.Parameters ?? string.Empty;
             activity.PageSize = model.PageSize;

@@ -100,10 +100,6 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             {
                 throw new InvalidOperationException(S[$"Failed to retrieve the query {Query} (Have you changed, deleted the query or disabled the feature?)"]);
             }
-            if (!query.ReturnDocuments)
-            {
-                throw new InvalidOperationException(S[$"Please enable return documents for this query"]);
-            }
             var queryParameters = !string.IsNullOrEmpty(Parameters) ?
                 JsonSerializer.Deserialize<Dictionary<string, object>>(Parameters)
                 : new Dictionary<string, object>();
@@ -116,7 +112,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             }
             try
             {
-                var results = await _queryManager.ExecuteQueryAsync(query, queryParameters);
+                IQueryResults results = await _queryManager.ExecuteQueryAsync(query, queryParameters);
                 foreach (ContentItem item in results.Items)
                 {
                     contentItems.Add(item);
@@ -133,11 +129,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
         {
             if (!((string)query.Template).Contains("from"))
             {
-                throw new InvalidOperationException(S[$"Your query has no 'from' parameter, please update your query if you want to use take."]);
+                throw new InvalidOperationException(S[@"Your query has no 'from' parameter, please update your query if you want to use take. I.e. 'from': { from | default: 0 } "]);
             }
             if (!((string)query.Template).Contains("size"))
             {
-                throw new InvalidOperationException(S[$"Your query has no 'size' parameter, please update your query if you want to use take."]);
+                throw new InvalidOperationException(S[@"Your query has no 'size' parameter, please update your query if you want to use take. I.e. 'take': { take | default: 10 }"]);
             }
         }
 
