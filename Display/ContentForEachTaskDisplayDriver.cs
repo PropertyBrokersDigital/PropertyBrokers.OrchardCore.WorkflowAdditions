@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using YesSql;
 using OrchardCore.Environment.Shell.Descriptor.Models;
 using System;
+using OrchardCore.Workflows.Models;
 
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
@@ -35,7 +36,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
                 model.UseQuery = activity.UseQuery;
                 model.QuerySource = activity.QuerySource;
                 model.Query = activity.Query;
-                model.Parameters = activity.Parameters;
+                model.Parameters = activity.Parameters?.Expression ?? "";
                 var queries = await _queryManager.ListQueriesAsync();
 
                 model.QuerySources = queries.Select(x => x.Source).Distinct()
@@ -67,7 +68,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             activity.ContentType = model.ContentType;
             activity.Query = model.Query ?? string.Empty;
             activity.QuerySource = model.QuerySource;
-            activity.Parameters = model.Parameters ?? string.Empty;
+            activity.Parameters = new WorkflowExpression<string>(model.Parameters);
             activity.PageSize = model.PageSize;
             activity.PublishedOnly = model.PublishedOnly;
         }

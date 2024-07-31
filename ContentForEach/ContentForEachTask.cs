@@ -1,22 +1,20 @@
 ﻿using Microsoft.Extensions.Localization;
+using Newtonsoft.Json.Schema;
+using OrchardCore.ContentManagement;
+using OrchardCore.ContentManagement.Records;
+using OrchardCore.ContentManagement.Workflows;
+using OrchardCore.Environment.Shell.Descriptor.Models;
+using OrchardCore.Queries;
 using OrchardCore.Workflows.Abstractions.Models;
 using OrchardCore.Workflows.Activities;
 using OrchardCore.Workflows.Models;
-using OrchardCore.ContentManagement;
-using OrchardCore.ContentManagement.Records;
-using YesSql;
+using OrchardCore.Workflows.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using OrchardCore.ContentManagement.Workflows;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using OrchardCore.Workflows.Services;
-using OrchardCore.Queries;
-using OrchardCore.Environment.Shell.Descriptor.Models;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using YesSql;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
 {
@@ -25,15 +23,13 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
         readonly IStringLocalizer S;
         private readonly ISession _session;
         private readonly IWorkflowScriptEvaluator _scriptEvaluator;
-        private readonly IContentManager _contentManager;
         private readonly ShellDescriptor _shellDescriptor;
         private readonly IServiceProvider _serviceProvider;
         private int _currentPage = 0;
 
-        public ContentForEachTask(IWorkflowScriptEvaluator scriptEvaluator, IContentManager contentManager, IStringLocalizer<ContentForEachTask> localizer, ISession session, ShellDescriptor shellDescriptor, IServiceProvider serviceProvider)
+        public ContentForEachTask(IWorkflowScriptEvaluator scriptEvaluator, IStringLocalizer<ContentForEachTask> localizer, ISession session, ShellDescriptor shellDescriptor, IServiceProvider serviceProvider)
         {
             _scriptEvaluator = scriptEvaluator;
-            _contentManager = contentManager;
             _session = session;
             S = localizer;
             _shellDescriptor = shellDescriptor;
@@ -62,7 +58,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
                 throw new InvalidOperationException($"The '{nameof(ContentForEachTask)}' can't process the query as the feature OrchardCore.Queries is not enabled");
             }
 
-            if (Index >= ContentItems.Count && !await FetchNextBatchAsync())
+            if (Index >= ContentItems.Count && !await FetchNextBatchAsync(workflowContext))
             {
                 return Outcomes("Done");
             }
@@ -71,7 +67,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             return Outcomes("Iterate");
         }
 
-        private async Task<bool> FetchNextBatchAsync()
+        private async Task<bool> FetchNextBatchAsync(WorkflowExecutionContext workflowContext)
         {
             //Have already looped once and there is no PageSize parameter so all results would have come with first query.
             if (_currentPage > 0 && PageSize == 0)
@@ -80,7 +76,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             }
             if (UseQuery)
             {
-                ContentItems = await ExecContentQueryAsync();
+                ContentItems = await ExecContentQueryAsync(workflowContext);
             }
             else
             {
@@ -91,7 +87,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             return ContentItems.Count > 0;
         }
 
-        private async Task<List<ContentItem>> ExecContentQueryAsync()
+        private async Task<List<ContentItem>> ExecContentQueryAsync(WorkflowExecutionContext workflowContext)
         {
             var _queryManager = (IQueryManager)_serviceProvider.GetService(typeof(IQueryManager));
             var contentItems = new List<ContentItem>();
@@ -100,19 +96,22 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             {
                 throw new InvalidOperationException(S[$"Failed to retrieve the query {Query} (Have you changed, deleted the query or disabled the feature?)"]);
             }
-            var queryParameters = !string.IsNullOrEmpty(Parameters) ?
-                JsonSerializer.Deserialize<Dictionary<string, object>>(Parameters)
+
+            string queryParameters = await _scriptEvaluator.EvaluateAsync(Parameters, workflowContext, null);
+
+            var parameters = !string.IsNullOrEmpty(queryParameters) ?
+                JsonSerializer.Deserialize<Dictionary<string, object>>(queryParameters)
                 : new Dictionary<string, object>();
 
             if (PageSize > 0)
             {
                 EnsureTemplateHasSizeAndFrom(query);
-                queryParameters["from"] = _currentPage * PageSize;
-                queryParameters["size"] = PageSize;
+                parameters["from"] = _currentPage * PageSize;
+                parameters["size"] = PageSize;
             }
             try
             {
-                IQueryResults results = await _queryManager.ExecuteQueryAsync(query, queryParameters);
+                IQueryResults results = await _queryManager.ExecuteQueryAsync(query, parameters);
                 foreach (ContentItem item in results.Items)
                 {
                     contentItems.Add(item);
@@ -225,9 +224,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
         /// <summary>
         /// Parameters to pass into the query.
         /// </summary>
-        public string Parameters
+        public WorkflowExpression<string> Parameters
         {
-            get => GetProperty(() => string.Empty);
+            get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
         }
         /// <summary>

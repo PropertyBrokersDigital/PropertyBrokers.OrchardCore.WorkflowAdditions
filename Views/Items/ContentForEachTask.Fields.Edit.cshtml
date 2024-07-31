@@ -32,7 +32,7 @@
                 <label asp-for="Parameters">@T["Parameters"]</label>
                 <textarea asp-for="Parameters" class="form-control" rows="5"></textarea>
                 <span asp-validation-for="Parameters"></span>
-                <span class="hint">@T["Enter the query parameters as a JSON object."]</span>
+                <span class="hint">@T[@"Enter the query parameters as a JSON object. I.e. {{ 'example' : 'parameter' }} - allows liquid expressions."]</span>
             </div>
         </div>
     </div>
