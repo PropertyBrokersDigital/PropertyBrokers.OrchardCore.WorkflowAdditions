@@ -96,7 +96,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             {
                 throw new InvalidOperationException(S[$"Failed to retrieve the query {Query} (Have you changed, deleted the query or disabled the feature?)"]);
             }
-
+            if (Parameters == null) Parameters = new WorkflowExpression<string>();
             string queryParameters = await _scriptEvaluator.EvaluateAsync(Parameters, workflowContext, null);
 
             var parameters = !string.IsNullOrEmpty(queryParameters) ?
