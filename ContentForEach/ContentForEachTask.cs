@@ -23,17 +23,15 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
     {
         readonly IStringLocalizer S;
         private readonly ISession _session;
-        private readonly IWorkflowScriptEvaluator _scriptEvaluator;
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly ShellDescriptor _shellDescriptor;
         private readonly IServiceProvider _serviceProvider;
         private int _currentPage = 0;
 
-        public ContentForEachTask(IWorkflowScriptEvaluator scriptEvaluator, IWorkflowExpressionEvaluator expressionEvaluator,
+        public ContentForEachTask(IWorkflowExpressionEvaluator expressionEvaluator,
             IStringLocalizer<ContentForEachTask> localizer, ISession session, ShellDescriptor shellDescriptor,
             IServiceProvider serviceProvider)
         {
-            _scriptEvaluator = scriptEvaluator;
             _session = session;
             S = localizer;
             _shellDescriptor = shellDescriptor;

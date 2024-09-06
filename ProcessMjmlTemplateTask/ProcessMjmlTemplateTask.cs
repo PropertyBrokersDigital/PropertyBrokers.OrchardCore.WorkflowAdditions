@@ -59,7 +59,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
 
             var builder = new StubbleBuilder().Configure(settings => settings.AddJsonNet()).Build();
 
-           string parsedMustacheTemplate = builder.Render(mjmlTemplate, mergeTags, new RenderSettings
+           string parsedMustacheTemplate = await builder.RenderAsync(mjmlTemplate, mergeTags, new RenderSettings
             {
                 SkipHtmlEncoding = true
             });
