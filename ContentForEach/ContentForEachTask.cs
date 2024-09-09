@@ -12,8 +12,9 @@ using OrchardCore.Workflows.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using YesSql;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
@@ -22,18 +23,20 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
     {
         readonly IStringLocalizer S;
         private readonly ISession _session;
-        private readonly IWorkflowScriptEvaluator _scriptEvaluator;
+        private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly ShellDescriptor _shellDescriptor;
         private readonly IServiceProvider _serviceProvider;
         private int _currentPage = 0;
 
-        public ContentForEachTask(IWorkflowScriptEvaluator scriptEvaluator, IStringLocalizer<ContentForEachTask> localizer, ISession session, ShellDescriptor shellDescriptor, IServiceProvider serviceProvider)
+        public ContentForEachTask(IWorkflowExpressionEvaluator expressionEvaluator,
+            IStringLocalizer<ContentForEachTask> localizer, ISession session, ShellDescriptor shellDescriptor,
+            IServiceProvider serviceProvider)
         {
-            _scriptEvaluator = scriptEvaluator;
             _session = session;
             S = localizer;
             _shellDescriptor = shellDescriptor;
             _serviceProvider = serviceProvider;
+            _expressionEvaluator = expressionEvaluator;
         }
 
         public override string Name => nameof(ContentForEachTask);
@@ -60,6 +63,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
 
             if (Index >= ContentItems.Count && !await FetchNextBatchAsync(workflowContext))
             {
+                //Need to reset current page when done so that it can be reused in the workflow loop
+                _currentPage = 0;
                 return Outcomes("Done");
             }
 
@@ -97,10 +102,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
                 throw new InvalidOperationException(S[$"Failed to retrieve the query {Query} (Have you changed, deleted the query or disabled the feature?)"]);
             }
             if (Parameters == null) Parameters = new WorkflowExpression<string>();
-            string queryParameters = await _scriptEvaluator.EvaluateAsync(Parameters, workflowContext, null);
 
-            var parameters = !string.IsNullOrEmpty(queryParameters) ?
-                JsonSerializer.Deserialize<Dictionary<string, object>>(queryParameters)
+            string queryParameters = await _expressionEvaluator.EvaluateAsync(Parameters, workflowContext, null);
+            
+            var parameters = !string.IsNullOrEmpty(queryParameters)
+                ? JsonConvert.DeserializeObject<Dictionary<string,object>>(queryParameters)
                 : new Dictionary<string, object>();
 
             if (PageSize > 0)
@@ -112,9 +118,16 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             try
             {
                 IQueryResults results = await _queryManager.ExecuteQueryAsync(query, parameters);
-                foreach (ContentItem item in results.Items)
+                if (results.Items is List<JObject> jObjectList)
                 {
-                    contentItems.Add(item);
+                    contentItems.AddRange(jObjectList.Select(temp => temp.ToObject<ContentItem>()));
+                }
+                else
+                {
+                    foreach (ContentItem item in results.Items)
+                    {
+                        contentItems.Add(item);
+                    }
                 }
             }
             catch (Exception e)

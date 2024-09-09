@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Localization;
 using Mjml.Net;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OrchardCore.Workflows.Abstractions.Models;
 using OrchardCore.Workflows.Activities;
@@ -9,11 +8,9 @@ using OrchardCore.Workflows.Services;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile;
 using Stubble.Core.Builders;
 using Stubble.Extensions.JsonNet;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Stubble.Core.Settings;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
 {
@@ -62,8 +59,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
 
             var builder = new StubbleBuilder().Configure(settings => settings.AddJsonNet()).Build();
 
-            string parsedMustacheTemplate = builder.Render(mjmlTemplate, mergeTags);
-
+           string parsedMustacheTemplate = await builder.RenderAsync(mjmlTemplate, mergeTags, new RenderSettings
+            {
+                SkipHtmlEncoding = true
+            });
             MjmlRenderer mjmlRenderer = new();
             MjmlOptions mjmlOptions = new()
             {
