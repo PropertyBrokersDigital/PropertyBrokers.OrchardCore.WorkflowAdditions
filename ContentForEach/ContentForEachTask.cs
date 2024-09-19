@@ -4,7 +4,6 @@ using OrchardCore.ContentManagement;
 using OrchardCore.ContentManagement.Records;
 using OrchardCore.ContentManagement.Workflows;
 using OrchardCore.Environment.Shell.Descriptor.Models;
-using OrchardCore.Queries;
 using OrchardCore.Workflows.Abstractions.Models;
 using OrchardCore.Workflows.Activities;
 using OrchardCore.Workflows.Models;
@@ -16,6 +15,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using YesSql;
+using OrchardCore.Queries;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
 {

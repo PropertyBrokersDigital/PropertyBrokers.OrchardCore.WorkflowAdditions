@@ -21,7 +21,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
         private readonly IContentDefinitionManager _contentDefinitionManager;
         private readonly ShellDescriptor _shellDescriptor;
         private readonly IServiceProvider _serviceProvider;
-        public ContentForEachTaskDisplayDriver(IContentDefinitionManager contentDefinitionManager, ISession session, ShellDescriptor shellDescriptor, IServiceProvider serviceProvider)
+        public ContentForEachTaskDisplayDriver(IContentDefinitionManager contentDefinitionManager, ShellDescriptor shellDescriptor, IServiceProvider serviceProvider)
         {
             _contentDefinitionManager = contentDefinitionManager;
             _shellDescriptor = shellDescriptor;
