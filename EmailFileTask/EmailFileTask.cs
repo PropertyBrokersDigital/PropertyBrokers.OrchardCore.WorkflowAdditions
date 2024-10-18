@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
+
 using OrchardCore.Email;
 using OrchardCore.Workflows.Abstractions.Models;
 using OrchardCore.Workflows.Activities;
@@ -14,23 +15,24 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
 {
     public class EmailFileTask : TaskActivity
     {
-        private readonly ISmtpService _smtpService;
+        private readonly IEmailService _emailService;
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly IStringLocalizer S;
         private readonly HtmlEncoder _htmlEncoder;
+
         private static readonly HttpClient _httpClient = new HttpClient();
 
         public EmailFileTask(
-            ISmtpService smtpService,
+            IEmailService emailService,
             IWorkflowExpressionEvaluator expressionEvaluator,
             IStringLocalizer<EmailFileTask> localizer,
             HtmlEncoder htmlEncoder
         )
         {
-            _smtpService = smtpService;
             _expressionEvaluator = expressionEvaluator;
             S = localizer;
             _htmlEncoder = htmlEncoder;
+            _emailService = emailService;
         }
 
         public override string Name => nameof(EmailFileTask);
@@ -124,7 +126,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
         {
             var attachmentUrl = await _expressionEvaluator.EvaluateAsync(AttachmentUrl, workflowContext, null);
             var request = new HttpRequestMessage(new HttpMethod("GET"), attachmentUrl);
-              var response =  await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+            var response =  await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
             var attachments = new List<MailMessageAttachment>();
 
             var author = await _expressionEvaluator.EvaluateAsync(Author, workflowContext, null);
@@ -134,8 +136,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             var cc = await _expressionEvaluator.EvaluateAsync(Cc, workflowContext, null);
             var bcc = await _expressionEvaluator.EvaluateAsync(Bcc, workflowContext, null);
             var subject = await _expressionEvaluator.EvaluateAsync(Subject, workflowContext, null);
-            var body = await _expressionEvaluator.EvaluateAsync(Body, workflowContext, _htmlEncoder);
-            var bodyText = await _expressionEvaluator.EvaluateAsync(BodyText, workflowContext, null);
+            var body = await _expressionEvaluator.EvaluateAsync(Body, workflowContext, IsBodyHtml ? _htmlEncoder : null);
             var message = new MailMessage
             {
                 // Author and Sender are both not required fields.
@@ -143,13 +144,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
                 To = recipients.Trim(),
                 Cc = cc?.Trim(),
                 Bcc = bcc?.Trim(),
-                // Email reply-to header https://tools.ietf.org/html/rfc4021#section-2.1.4
                 ReplyTo = replyTo?.Trim(),
                 Subject = subject.Trim(),
                 Body = body?.Trim(),
-                BodyText = bodyText?.Trim(),
-                IsBodyHtml = IsBodyHtml,
-                IsBodyText = IsBodyText
+                IsHtmlBody = IsBodyHtml,
+                Attachments = attachments
             };
             if (!String.IsNullOrWhiteSpace(sender))
             {
@@ -165,9 +164,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
                 attachment.Stream = ms;
                 attachment.Filename = fileName;
                 attachments.Add(attachment);
-                message.Attachments = attachments;
                 
-                var result = await _smtpService.SendAsync(message);
+                var result = await _emailService.SendAsync(message);
                 workflowContext.LastResult = result;
 
                 if (!result.Succeeded)
@@ -177,7 +175,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             }
             else if(SendWithNoAttachment)
             {
-                var result = await _smtpService.SendAsync(message);
+                var result = await _emailService.SendAsync(message);
                 workflowContext.LastResult = result;
 
                 if (!result.Succeeded)

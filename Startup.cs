@@ -32,7 +32,6 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<ValidateJsonTask, ValidateJsonTaskDisplayDriver>();
             services.AddActivity<ProcessMjmlTemplateTask, ProcessMjmlTemplateTaskDisplayDriver>();
             services.AddActivity<GoogleAnalyticsEventTask, GoogleAnalyticsEventTaskDisplayDriver>();
-            services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<ISecureUrlTokenService, SecureUrlTokenService>();
             services.AddActivity<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskDisplayDriver>();
             services.AddActivity<SaveFileToMediaTask, SaveFileToMediaTaskDisplayDriver>();
