@@ -32,28 +32,36 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             model.QueriesEnabled = _shellDescriptor.Features.Any(feature => feature.Id == "OrchardCore.Queries");
             if (model.QueriesEnabled)
             {
-                var _queryManager = (IQueryManager)_serviceProvider.GetService(typeof(IQueryManager));
+                var queryManager = (IQueryManager)_serviceProvider.GetService(typeof(IQueryManager));
                 model.UseQuery = activity.UseQuery;
                 model.QuerySource = activity.QuerySource;
                 model.Query = activity.Query;
-                model.Parameters = activity.Parameters?.Expression ?? "";
-                var queries = await _queryManager.ListQueriesAsync();
 
+                // NEW: Handle Parameters more carefully
+                try
+                {
+                    model.Parameters = activity.Parameters?.Expression ?? "";
+                }
+                catch (System.Text.Json.JsonException)
+                {
+                    // If Parameters failed to deserialize, try to create a new empty one
+                    activity.Parameters = new WorkflowExpression<string>("");
+                    model.Parameters = "";
+                }
+
+                var queries = await queryManager.ListQueriesAsync();
                 model.QuerySources = queries.Select(x => x.Source).Distinct()
                     .Select(x => new SelectListItem { Text = x, Value = x })
                     .ToList();
-
                 model.QueriesBySource = queries.GroupBy(x => x.Source)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(q => new SelectListItem { Text = q.Name, Value = q.Name }).ToList());
-
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(q => new SelectListItem { Text = q.Name, Value = q.Name }).ToList());
             }
             else
             {
                 model.UseQuery = false;
             }
-
             model.AvailableContentTypes = (await _contentDefinitionManager.ListTypeDefinitionsAsync())
                 .Select(x => new SelectListItem { Text = x.DisplayName, Value = x.Name })
                 .ToList();
