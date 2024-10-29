@@ -12,10 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using YesSql;
 using OrchardCore.Queries;
+using System.Text.Json.Dynamic;
+using System.Text.Json.Nodes;
+using System.Text.Json;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
 {
@@ -106,7 +107,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             string queryParameters = await _expressionEvaluator.EvaluateAsync(Parameters, workflowContext, null);
             
             var parameters = !string.IsNullOrEmpty(queryParameters)
-                ? JsonConvert.DeserializeObject<Dictionary<string,object>>(queryParameters)
+                ? JsonSerializer.Deserialize<Dictionary<string,object>>(queryParameters)
                 : new Dictionary<string, object>();
 
             if (PageSize > 0)
@@ -118,7 +119,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
             try
             {
                 IQueryResults results = await _queryManager.ExecuteQueryAsync(query, parameters);
-                if (results.Items is List<JObject> jObjectList)
+                if (results.Items is List<JsonObject> jObjectList)
                 {
                     contentItems.AddRange(jObjectList.Select(temp => temp.ToObject<ContentItem>()));
                 }
@@ -139,13 +140,36 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
 
         private void EnsureTemplateHasSizeAndFrom(dynamic query)
         {
-            if (!((string)query.Template).Contains("from"))
+            JsonObject properties = query.Properties;
+            var templateString = properties["Template"]?.GetValue<string>();
+            if (string.IsNullOrEmpty(templateString))
             {
-                throw new InvalidOperationException(S[@"Your query has no 'from' parameter, please update your query if you want to use take. I.e. 'from': { from | default: 0 } "]);
+                throw new InvalidOperationException("Template is missing or empty");
             }
-            if (!((string)query.Template).Contains("size"))
+
+            try
             {
-                throw new InvalidOperationException(S[@"Your query has no 'size' parameter, please update your query if you want to use take. I.e. 'take': { take | default: 10 }"]);
+                var templateNode = JsonNode.Parse(templateString);
+                if (templateNode == null)
+                {
+                    throw new InvalidOperationException("Failed to parse template");
+                }
+
+                var jsonObject = templateNode.AsObject();
+
+                if (jsonObject["from"] == null)
+                {
+                    throw new InvalidOperationException(@"Your query has no 'from' parameter, please update your query if you want to use take. I.e. 'from': { from | default: 0 }");
+                }
+
+                if (jsonObject["size"] == null)
+                {
+                    throw new InvalidOperationException(@"Your query has no 'size' parameter, please update your query if you want to use take. I.e. 'take': { take | default: 10 }");
+                }
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException($"Invalid template JSON format: {ex.Message}");
             }
         }
 
