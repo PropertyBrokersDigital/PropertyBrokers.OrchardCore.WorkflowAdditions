@@ -48,9 +48,26 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
             set => SetProperty(value);
         }
 
+        public WorkflowExpression<string> SessionId
+        {
+            get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+        }
+        
         public WorkflowExpression<string> ClientId
         {
             get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+        }
+        
+        public WorkflowExpression<long> RequestTimeStamp
+        {
+            get => GetProperty(() => new WorkflowExpression<long>());
+            set => SetProperty(value);
+
+        }public WorkflowExpression<long> EventTimeStamp
+        {
+            get => GetProperty(() => new WorkflowExpression<long>());
             set => SetProperty(value);
         }
 
@@ -79,6 +96,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
                 var apiSecret = await _expressionEvaluator.EvaluateAsync(ApiSecret, workflowContext, null);
                 var clientId = await _expressionEvaluator.EvaluateAsync(ClientId, workflowContext, null);
                 var eventName = await _expressionEvaluator.EvaluateAsync(EventName, workflowContext, null);
+                var event_timestamp = await _expressionEvaluator.EvaluateAsync(EventTimeStamp, workflowContext, null);
+                var sessionId = await _expressionEvaluator.EvaluateAsync(SessionId, workflowContext, null);
+                var request_timestamp = await _expressionEvaluator.EvaluateAsync(RequestTimeStamp, workflowContext, null);
                 var eventParamsExpression = await _expressionEvaluator.EvaluateAsync(EventParamsExpression, workflowContext, null);
 
                 if (string.IsNullOrEmpty(measurementId) || string.IsNullOrEmpty(apiSecret))
@@ -91,6 +111,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
                 {
                     workflowContext.LastResult = S["Event Name is required"].Value;
                     return Outcomes(error);
+                }
+
+                if (string.IsNullOrEmpty(sessionId))
+                {
+                    sessionId = Guid.NewGuid().ToString();
                 }
 
                 if (string.IsNullOrEmpty(clientId))
@@ -106,12 +131,17 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
 
                 var payload = new
                 {
+                    //Event Level, Page load
                     client_id = clientId,
+                    timestamp_micros = event_timestamp,
                     events = new[]
                     {
                         new
                         {
+                            //Request Level eg. form submitted
                             name = eventName,
+                            timestamp_micros = request_timestamp,
+                            session_id = sessionId,
                             @params = eventParams
                         }
                     }

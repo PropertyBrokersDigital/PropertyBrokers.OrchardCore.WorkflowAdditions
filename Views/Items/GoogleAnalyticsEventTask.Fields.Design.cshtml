@@ -10,6 +10,9 @@
 <ul class="mt-2">
     <li><strong>@T["Measurement ID:"]</strong> @Model.Activity.MeasurementId.Expression</li>
     <li><strong>@T["Event Name:"]</strong> @Model.Activity.EventName.Expression</li>
+    <li><strong>@T["Session Id:"]</strong> @(string.IsNullOrEmpty(Model.Activity.SessionId.Expression) ? T["Auto-generated"] : Model.Activity.SessionId.Expression)</li>
     <li><strong>@T["Client ID:"]</strong> @(string.IsNullOrEmpty(Model.Activity.ClientId.Expression) ? T["Auto-generated"] : Model.Activity.ClientId.Expression)</li>
+    <li><strong>@T["Event Time:"]</strong> @(string.IsNullOrEmpty(Model.Activity.EventTimeStamp.Expression) ? T["Auto-generated"] : Model.Activity.EventTimeStamp.Expression)</li>
+    <li><strong>@T["Request Time:"]</strong> @(string.IsNullOrEmpty(Model.Activity.RequestTimeStamp.Expression) ? T["Auto-generated"] : Model.Activity.RequestTimeStamp.Expression)</li>
     <li><strong>@T["Event Parameters:"]</strong> @(string.IsNullOrEmpty(Model.Activity.EventParamsExpression.Expression) ? T["None"] : T["Set"])</li>
 </ul>
