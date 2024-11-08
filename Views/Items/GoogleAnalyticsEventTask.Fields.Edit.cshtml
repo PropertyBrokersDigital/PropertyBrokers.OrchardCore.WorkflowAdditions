@@ -16,16 +16,16 @@
 </div>
 
 <div class="form-group" asp-validation-class-for="SessionId">
-    <label for="SessionId" class="form-label">@T["Client ID"]</label>
+    <label for="SessionId" class="form-label">@T["Session Id"]</label>
     <input asp-for="SessionId" type="text" class="form-control code" />
     <span asp-validation-for="SessionId" class="text-danger"></span>
-    <span class="hint">@T["The Session ID for this event. Derived from _ga_<MeasurementId> cookie; Leave blank to generate automatically."]</span>
+    <span class="hint">@T["The Session ID for this event. Derived from cookie _ga_<MeasurementId>; Load it from form entry data."]</span>
 </div>
 <div class="form-group" asp-validation-class-for="ClientId">
     <label for="ClientId" class="form-label">@T["Client ID"]</label>
     <input asp-for="ClientId" type="text" class="form-control code" />
     <span asp-validation-for="ClientId" class="text-danger"></span>
-    <span class="hint">@T["The Client ID for this event. Derived from HttpContext; Leave blank to generate automatically."]</span>
+    <span class="hint">@T["The Client ID for this event. Derived from cookie _ga_<MeasurementId>;"]</span>
 </div>
 <div class="form-group" asp-validation-class-for="EventTimeStamp">
     <label for="EventTimeStamp" class="form-label">@T["Event Time Stamp"]</label>
@@ -40,7 +40,7 @@
     <input asp-for="RequestTimeStamp" type="number" class="form-control code" />
     <span asp-validation-for="RequestTimeStamp" class="text-danger"></span>
     <span class="hint">
-        @T["GA4 timestamp in microseconds (current UTC: {0}). Leave blank to generate automatically.",
+        @T["GA4 timestamp in microseconds (current UTC: {0}). Generated on button submit.",
                  ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds() * 1000]
     </span>
 </div>
