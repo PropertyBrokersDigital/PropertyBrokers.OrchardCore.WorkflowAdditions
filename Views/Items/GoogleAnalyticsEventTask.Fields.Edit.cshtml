@@ -7,19 +7,11 @@
     <span asp-validation-for="MeasurementId" class="text-danger"></span>
     <span class="hint">@T["The Measurement ID for your GA4 property (e.g., G-XXXXXXXXXX)."]</span>
 </div>
-
 <div class="form-group" asp-validation-class-for="ApiSecret">
     <label for="ApiSecret" class="form-label">@T["API Secret"]</label>
     <input asp-for="ApiSecret" type="text" class="form-control code" autocomplete="off" />
     <span asp-validation-for="ApiSecret" class="text-danger"></span>
     <span class="hint">@T["The API Secret for your GA4 property. Keep this confidential."]</span>
-</div>
-
-<div class="form-group" asp-validation-class-for="SessionId">
-    <label for="SessionId" class="form-label">@T["Session Id"]</label>
-    <input asp-for="SessionId" type="text" class="form-control code" />
-    <span asp-validation-for="SessionId" class="text-danger"></span>
-    <span class="hint">@T["The Session ID for this event. Derived from cookie _ga_<MeasurementId>; Load it from form entry data."]</span>
 </div>
 <div class="form-group" asp-validation-class-for="ClientId">
     <label for="ClientId" class="form-label">@T["Client ID"]</label>
@@ -33,14 +25,6 @@
     <span asp-validation-for="EventTimeStamp" class="text-danger"></span>
     <span class="hint">
         @T["GA4 timestamp in microseconds (current UTC: {0}). Leave blank to generate automatically.",
-                 ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds() * 1000]
-    </span>
-</div><div class="form-group" asp-validation-class-for="RequestTimeStamp">
-    <label for="RequestTimeStamp" class="form-label">@T["Request Time Stamp"]</label>
-    <input asp-for="RequestTimeStamp" type="text" class="form-control code" />
-    <span asp-validation-for="RequestTimeStamp" class="text-danger"></span>
-    <span class="hint">
-        @T["GA4 timestamp in microseconds (current UTC: {0}). Generated on button submit.",
                  ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds() * 1000]
     </span>
 </div>
@@ -77,11 +61,13 @@
         // Example of the event parameters object
         var exampleEventParams = {
             enquiry_type: "{{ Workflow.Properties.Enquiry_Type }}",
+            session_id : "{{ Workflow.Properties.SessionId }}",
             agent_id: "{{ Workflow.Properties.Agent_Id }}",
             branch_id: "{{ Workflow.Properties.Branch_Id }}",
             form_id: "{{ Workflow.Properties.Form_Name }}",
             page_url: "{{ Workflow.Properties.__Referring_Page }}",
             campaign: "{{ Workflow.Properties.Campaign_Name }}",
+            request_timestamp : "{{ Workflow.Properties.RequestTimeStamp }}",
             property_reference: "{{ Workflow.Properties.Listing_Reference }}",
         };
 

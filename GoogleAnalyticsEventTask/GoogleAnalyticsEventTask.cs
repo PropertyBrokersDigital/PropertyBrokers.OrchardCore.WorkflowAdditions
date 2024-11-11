@@ -10,8 +10,6 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using Parlot.Fluent;
-using Fluid.Parser;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
 {
@@ -97,7 +95,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
                 var clientId = await _expressionEvaluator.EvaluateAsync(ClientId, workflowContext, null);
                 var eventName = await _expressionEvaluator.EvaluateAsync(EventName, workflowContext, null);
                 var event_timestamp = await _expressionEvaluator.EvaluateAsync(EventTimeStamp, workflowContext, null);
-                var sessionId = await _expressionEvaluator.EvaluateAsync(SessionId, workflowContext, null);
+                
                 var request_timestamp = await _expressionEvaluator.EvaluateAsync(RequestTimeStamp, workflowContext, null);
                 var eventParamsExpression = await _expressionEvaluator.EvaluateAsync(EventParamsExpression, workflowContext, null);
 
@@ -113,11 +111,6 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
                     return Outcomes(error);
                 }
 
-                if (string.IsNullOrEmpty(sessionId))
-                {
-                    sessionId = Guid.NewGuid().ToString();
-                }
-
                 if (string.IsNullOrEmpty(clientId))
                 {
                     clientId = Guid.NewGuid().ToString();
@@ -131,18 +124,15 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
 
                 var payload = new
                 {
-                    //Event Level, Page load
-                    client_id = clientId,
-                    timestamp_micros = event_timestamp,
+                    client_id = clientId,  // Client ID at the top level
+                    timestamp_micros = event_timestamp,  // Top-level timestamp for the entire batch of events
                     events = new[]
                     {
                         new
                         {
-                            //Request Level eg. form submitted
-                            name = eventName,
-                            timestamp_micros = request_timestamp,
-                            session_id = sessionId,
-                            @params = eventParams
+                            name = eventName,  // Event name, e.g., "form_submit"
+                            timestamp_micros = request_timestamp,  // Event-level timestamp
+                            @params = eventParams  // Event parameters, such as session_id and others
                         }
                     }
                 };
