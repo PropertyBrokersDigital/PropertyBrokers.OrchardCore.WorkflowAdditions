@@ -60,14 +60,14 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
             set => SetProperty(value);
         }
         
-        public WorkflowExpression<long> RequestTimeStamp
+        public WorkflowExpression<string> RequestTimeStamp
         {
-            get => GetProperty(() => new WorkflowExpression<long>());
+            get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
 
-        }public WorkflowExpression<long> EventTimeStamp
+        }public WorkflowExpression<string> EventTimeStamp
         {
-            get => GetProperty(() => new WorkflowExpression<long>());
+            get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
         }
 
@@ -150,8 +150,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
                 var json = JsonConvert.SerializeObject(payload);
                 var content = new ByteArrayContent(Encoding.UTF8.GetBytes(json));
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                
                 var url = $"https://www.google-analytics.com/mp/collect?measurement_id={measurementId}&api_secret={apiSecret}";
-
+                
                 var response = await _httpClient.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)

@@ -6,8 +6,8 @@
         public string ApiSecret { get; set; }
         public string SessionId { get; set; }
         public string ClientId { get; set; }
-        public long EventTimeStamp { get; set; }    // Long type
-        public long RequestTimeStamp { get; set; }  // Long type
+        public string EventTimeStamp { get; set; }   
+        public string RequestTimeStamp { get; set; }  //Questionable if these should be strings or longs... 
         public string EventName { get; set; }
         public string EventParamsExpression { get; set; }
     }

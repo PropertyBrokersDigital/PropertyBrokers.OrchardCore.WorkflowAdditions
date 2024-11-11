@@ -29,7 +29,7 @@
 </div>
 <div class="form-group" asp-validation-class-for="EventTimeStamp">
     <label for="EventTimeStamp" class="form-label">@T["Event Time Stamp"]</label>
-    <input asp-for="EventTimeStamp" type="number" class="form-control code" />
+    <input asp-for="EventTimeStamp" type="text" class="form-control code" />
     <span asp-validation-for="EventTimeStamp" class="text-danger"></span>
     <span class="hint">
         @T["GA4 timestamp in microseconds (current UTC: {0}). Leave blank to generate automatically.",
@@ -37,7 +37,7 @@
     </span>
 </div><div class="form-group" asp-validation-class-for="RequestTimeStamp">
     <label for="RequestTimeStamp" class="form-label">@T["Request Time Stamp"]</label>
-    <input asp-for="RequestTimeStamp" type="number" class="form-control code" />
+    <input asp-for="RequestTimeStamp" type="text" class="form-control code" />
     <span asp-validation-for="RequestTimeStamp" class="text-danger"></span>
     <span class="hint">
         @T["GA4 timestamp in microseconds (current UTC: {0}). Generated on button submit.",
@@ -76,13 +76,13 @@
 
         // Example of the event parameters object
         var exampleEventParams = {
-            form_id: "{{ Workflow.Properties.Form_Name }}",
+            enquiry_type: "{{ Workflow.Properties.Enquiry_Type }}",
             agent_id: "{{ Workflow.Properties.Agent_Id }}",
             branch_id: "{{ Workflow.Properties.Branch_Id }}",
-            enquiry_type: "{{ Workflow.Properties.Enquiry_Type }}",
-            property_reference: "{{ Workflow.Properties.Listing_Reference }}",
+            form_id: "{{ Workflow.Properties.Form_Name }}",
             page_url: "{{ Workflow.Properties.__Referring_Page }}",
-            timestamp: "{{ 'Now' | date: 'o' }}"
+            campaign: "{{ Workflow.Properties.Campaign_Name }}",
+            property_reference: "{{ Workflow.Properties.Listing_Reference }}",
         };
 
         // Create button and container

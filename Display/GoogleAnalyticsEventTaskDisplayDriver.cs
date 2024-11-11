@@ -12,8 +12,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
             model.ClientId = activity.ClientId.Expression;
             model.SessionId = activity.SessionId.Expression;
             model.EventName = activity.EventName.Expression;
-            model.EventTimeStamp = long.TryParse(activity.EventTimeStamp.Expression, out long et) ? et : 0;
-            model.RequestTimeStamp = long.TryParse(activity.RequestTimeStamp.Expression, out long rt) ? rt : 0;
+            model.EventTimeStamp = activity.EventTimeStamp.Expression;
+            model.RequestTimeStamp = activity.RequestTimeStamp.Expression;
             model.EventParamsExpression = activity.EventParamsExpression.Expression;
         }
 
@@ -22,10 +22,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
             activity.MeasurementId = new WorkflowExpression<string>(model.MeasurementId);
             activity.ApiSecret = new WorkflowExpression<string>(model.ApiSecret);
             activity.ClientId = new WorkflowExpression<string>(model.ClientId);
-            model.SessionId = activity.SessionId.Expression;
+            activity.SessionId = new WorkflowExpression<string>(model.SessionId);
             activity.EventName = new WorkflowExpression<string>(model.EventName);
-            activity.EventTimeStamp = new WorkflowExpression<long>(model.EventTimeStamp.ToString());
-            activity.RequestTimeStamp = new WorkflowExpression<long>(model.RequestTimeStamp.ToString());
+            activity.EventTimeStamp = new WorkflowExpression<string>(model.EventTimeStamp);
+            activity.RequestTimeStamp = new WorkflowExpression<string>(model.RequestTimeStamp);
             activity.EventParamsExpression = new WorkflowExpression<string>(model.EventParamsExpression);
         }
     }
