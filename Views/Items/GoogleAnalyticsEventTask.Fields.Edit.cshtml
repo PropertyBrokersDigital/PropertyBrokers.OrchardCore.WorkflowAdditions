@@ -7,28 +7,33 @@
     <span asp-validation-for="MeasurementId" class="text-danger"></span>
     <span class="hint">@T["The Measurement ID for your GA4 property (e.g., G-XXXXXXXXXX)."]</span>
 </div>
-
 <div class="form-group" asp-validation-class-for="ApiSecret">
     <label for="ApiSecret" class="form-label">@T["API Secret"]</label>
     <input asp-for="ApiSecret" type="text" class="form-control code" autocomplete="off" />
     <span asp-validation-for="ApiSecret" class="text-danger"></span>
     <span class="hint">@T["The API Secret for your GA4 property. Keep this confidential."]</span>
 </div>
-
 <div class="form-group" asp-validation-class-for="ClientId">
     <label for="ClientId" class="form-label">@T["Client ID"]</label>
     <input asp-for="ClientId" type="text" class="form-control code" />
     <span asp-validation-for="ClientId" class="text-danger"></span>
-    <span class="hint">@T["The Client ID for this event. Leave blank to generate automatically."]</span>
+    <span class="hint">@T["The Client ID for this event. Derived from cookie _ga_<MeasurementId>;"]</span>
 </div>
-
+<div class="form-group" asp-validation-class-for="EventTimeStamp">
+    <label for="EventTimeStamp" class="form-label">@T["Event Time Stamp"]</label>
+    <input asp-for="EventTimeStamp" type="text" class="form-control code" />
+    <span asp-validation-for="EventTimeStamp" class="text-danger"></span>
+    <span class="hint">
+        @T["GA4 timestamp in microseconds (current UTC: {0}). Leave blank to generate automatically.",
+                 ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds() * 1000]
+    </span>
+</div>
 <div class="form-group" asp-validation-class-for="EventName">
     <label for="EventName" class="form-label">@T["Event Name"]</label>
     <input asp-for="EventName" type="text" class="form-control code" />
     <span asp-validation-for="EventName" class="text-danger"></span>
     <span class="hint">@T["The name of the event to send. You can use workflow expressions here."]</span>
 </div>
-
 <div class="form-group" asp-validation-class-for="EventParamsExpression">
     <label for="EventParamsExpression" class="form-label">@T["Event Parameters Expression"]</label>
     <span class="hint">@T["The expression to build the event parameters object. You can use workflow expressions here. Matching the event in GA will yield best results."]</span>
@@ -55,13 +60,15 @@
 
         // Example of the event parameters object
         var exampleEventParams = {
-            form_id: "{{ Workflow.Properties.Form_Name }}",
+            enquiry_type: "{{ Workflow.Properties.Enquiry_Type }}",
+            session_id : "{{ Workflow.Properties.SessionId }}",
             agent_id: "{{ Workflow.Properties.Agent_Id }}",
             branch_id: "{{ Workflow.Properties.Branch_Id }}",
-            enquiry_type: "{{ Workflow.Properties.Enquiry_Type }}",
-            property_reference: "{{ Workflow.Properties.Listing_Reference }}",
+            form_id: "{{ Workflow.Properties.Form_Name }}",
             page_url: "{{ Workflow.Properties.__Referring_Page }}",
-            timestamp: "{{ 'Now' | date: 'o' }}"
+            campaign: "{{ Workflow.Properties.Campaign_Name }}",
+            request_timestamp : "{{ Workflow.Properties.RequestTimeStamp }}",
+            property_reference: "{{ Workflow.Properties.Listing_Reference }}",
         };
 
         // Create button and container
