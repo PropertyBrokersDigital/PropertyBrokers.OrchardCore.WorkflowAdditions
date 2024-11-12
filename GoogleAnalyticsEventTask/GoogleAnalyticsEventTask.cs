@@ -10,8 +10,6 @@ using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using Parlot.Fluent;
-using Fluid.Parser;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
 {
@@ -48,7 +46,24 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
             set => SetProperty(value);
         }
 
+        public WorkflowExpression<string> SessionId
+        {
+            get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+        }
+        
         public WorkflowExpression<string> ClientId
+        {
+            get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+        }
+        
+        public WorkflowExpression<string> RequestTimeStamp
+        {
+            get => GetProperty(() => new WorkflowExpression<string>());
+            set => SetProperty(value);
+
+        }public WorkflowExpression<string> EventTimeStamp
         {
             get => GetProperty(() => new WorkflowExpression<string>());
             set => SetProperty(value);
@@ -79,6 +94,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
                 var apiSecret = await _expressionEvaluator.EvaluateAsync(ApiSecret, workflowContext, null);
                 var clientId = await _expressionEvaluator.EvaluateAsync(ClientId, workflowContext, null);
                 var eventName = await _expressionEvaluator.EvaluateAsync(EventName, workflowContext, null);
+                var event_timestamp = await _expressionEvaluator.EvaluateAsync(EventTimeStamp, workflowContext, null);
+                
+                var request_timestamp = await _expressionEvaluator.EvaluateAsync(RequestTimeStamp, workflowContext, null);
                 var eventParamsExpression = await _expressionEvaluator.EvaluateAsync(EventParamsExpression, workflowContext, null);
 
                 if (string.IsNullOrEmpty(measurementId) || string.IsNullOrEmpty(apiSecret))
@@ -106,13 +124,15 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
 
                 var payload = new
                 {
-                    client_id = clientId,
+                    client_id = clientId,  // Client ID at the top level
+                    timestamp_micros = event_timestamp,  // Top-level timestamp for the entire batch of events
                     events = new[]
                     {
                         new
                         {
-                            name = eventName,
-                            @params = eventParams
+                            name = eventName,  // Event name, e.g., "form_submit"
+                            timestamp_micros = request_timestamp,  // Event-level timestamp
+                            @params = eventParams  // Event parameters, such as session_id and others
                         }
                     }
                 };
@@ -120,8 +140,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
                 var json = JsonConvert.SerializeObject(payload);
                 var content = new ByteArrayContent(Encoding.UTF8.GetBytes(json));
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                
                 var url = $"https://www.google-analytics.com/mp/collect?measurement_id={measurementId}&api_secret={apiSecret}";
-
+                
                 var response = await _httpClient.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)

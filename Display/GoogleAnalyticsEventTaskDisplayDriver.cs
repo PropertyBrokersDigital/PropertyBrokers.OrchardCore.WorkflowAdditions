@@ -11,6 +11,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
             model.ApiSecret = activity.ApiSecret.Expression;
             model.ClientId = activity.ClientId.Expression;
             model.EventName = activity.EventName.Expression;
+            model.EventTimeStamp = activity.EventTimeStamp.Expression;
             model.EventParamsExpression = activity.EventParamsExpression.Expression;
         }
 
@@ -20,6 +21,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent
             activity.ApiSecret = new WorkflowExpression<string>(model.ApiSecret);
             activity.ClientId = new WorkflowExpression<string>(model.ClientId);
             activity.EventName = new WorkflowExpression<string>(model.EventName);
+            activity.EventTimeStamp = new WorkflowExpression<string>(model.EventTimeStamp);
             activity.EventParamsExpression = new WorkflowExpression<string>(model.EventParamsExpression);
         }
     }
