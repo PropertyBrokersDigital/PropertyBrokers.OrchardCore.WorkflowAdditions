@@ -175,12 +175,24 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ContentForEach
 
         private async Task ExecuteContentTypeQueryAsync()
         {
-            ContentItems = await _session
+            var query = _session
                 .Query<ContentItem, ContentItemIndex>(index => index.ContentType == ContentType)
-                .Where(w => (w.Published || w.Published == PublishedOnly) && (w.Latest || w.Latest == !PublishedOnly))
-                .Skip(_currentPage * PageSize)
-                .Take(PageSize)
-                .ListAsync() as List<ContentItem>;
+                .Where(w => (w.Published || w.Published == PublishedOnly) && w.Latest);
+            
+            if (PageSize > 0)
+            {
+                query = (IQuery<ContentItem, ContentItemIndex>)query.Take(PageSize);
+            }
+
+            // Apply paging after the where clause
+            if (PageSize > 0 && _currentPage > 0)
+            {
+                query = (IQuery<ContentItem, ContentItemIndex>)query.Skip(_currentPage * PageSize);
+            }
+
+            ContentItems = (await query
+                .ListAsync())
+                .ToList();
         }
         private void ProcessContentItem(WorkflowExecutionContext workflowContext)
         {
