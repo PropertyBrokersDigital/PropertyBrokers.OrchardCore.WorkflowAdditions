@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -126,9 +127,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
         {
             var attachmentUrl = await _expressionEvaluator.EvaluateAsync(AttachmentUrl, workflowContext, null);
             var request = new HttpRequestMessage(new HttpMethod("GET"), attachmentUrl);
-            var response =  await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
             var attachments = new List<MailMessageAttachment>();
 
+            // Email setup
             var author = await _expressionEvaluator.EvaluateAsync(Author, workflowContext, null);
             var sender = await _expressionEvaluator.EvaluateAsync(Sender, workflowContext, null);
             var replyTo = await _expressionEvaluator.EvaluateAsync(ReplyTo, workflowContext, null);
@@ -137,9 +139,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             var bcc = await _expressionEvaluator.EvaluateAsync(Bcc, workflowContext, null);
             var subject = await _expressionEvaluator.EvaluateAsync(Subject, workflowContext, null);
             var body = await _expressionEvaluator.EvaluateAsync(Body, workflowContext, IsBodyHtml ? _htmlEncoder : null);
+
             var message = new MailMessage
             {
-                // Author and Sender are both not required fields.
                 From = author?.Trim() ?? sender?.Trim(),
                 To = recipients.Trim(),
                 Cc = cc?.Trim(),
@@ -150,34 +152,60 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
                 IsHtmlBody = IsBodyHtml,
                 Attachments = attachments
             };
+
             if (!String.IsNullOrWhiteSpace(sender))
             {
                 message.Sender = sender.Trim();
             }
-            
-            if (response.Content.Headers.ContentDisposition != null)
+
+            // Handle attachment if response is successful
+            if (response.IsSuccessStatusCode)
             {
-                var fileName = response.Content.Headers.ContentDisposition.FileName;
-                response.EnsureSuccessStatusCode();
+                string fileName;
+
+                // Try to get filename from Content-Disposition header
+                if (response.Content.Headers.ContentDisposition != null)
+                {
+                    fileName = response.Content.Headers.ContentDisposition.FileName;
+                }
+                // If no Content-Disposition, extract filename from URL
+                else
+                {
+                    fileName = Path.GetFileName(new Uri(attachmentUrl).LocalPath);
+
+                    // If still no filename, generate one based on content type
+                    if (string.IsNullOrEmpty(fileName))
+                    {
+                        var extension = response.Content.Headers.ContentType?.MediaType switch
+                        {
+                            "application/pdf" => ".pdf",
+                            "image/jpeg" => ".jpg",
+                            "image/png" => ".png",
+                            _ => ".dat"
+                        };
+                        fileName = $"attachment_{DateTime.Now:yyyyMMddHHmmss}{extension}";
+                    }
+                }
+
                 await using var ms = await response.Content.ReadAsStreamAsync();
-                var attachment = new MailMessageAttachment();
-                attachment.Stream = ms;
-                attachment.Filename = fileName;
+                var attachment = new MailMessageAttachment
+                {
+                    Stream = ms,
+                    Filename = fileName
+                };
                 attachments.Add(attachment);
-                
+
                 var result = await _emailService.SendAsync(message);
                 workflowContext.LastResult = result;
-
                 if (!result.Succeeded)
                 {
                     return Outcomes("Failed");
                 }
             }
-            else if(SendWithNoAttachment)
+            else if (SendWithNoAttachment)
             {
                 var result = await _emailService.SendAsync(message);
                 workflowContext.LastResult = result;
-
                 if (!result.Succeeded)
                 {
                     return Outcomes("Failed");
