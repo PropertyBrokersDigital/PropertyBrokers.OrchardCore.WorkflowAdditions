@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mjml.Net" Version="3.13.0" />
+    <PackageReference Include="Mjml.Net" Version="4.7.0" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
-    <PackageReference Include="OrchardCore.Module.Targets" Version="2.0.2" />
+    <PackageReference Include="OrchardCore.Module.Targets" Version="2.1.4" />
     <PackageReference Include="Stubble.Core" Version="1.10.8" />
     <PackageReference Include="Stubble.Extensions.JsonNet" Version="1.2.3" />
   </ItemGroup>
@@ -21,16 +21,16 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OrchardCore.Contents" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.Email" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.Queries" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.Users" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.Workflows" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.ContentManagement" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.Data.Abstractions" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.0.2" />
-		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.0.2" />
+		<PackageReference Include="OrchardCore.Contents" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Email" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Queries" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Users" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Workflows" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.ContentManagement" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Data.Abstractions" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.1.4" />
 	</ItemGroup>
 
 	<ItemGroup>
