@@ -11,6 +11,7 @@
     <PackageReference Include="Mjml.Net" Version="4.7.0" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+    <PackageReference Include="OrchardCore.Module.Targets" Version="2.1.4" />
     <PackageReference Include="Stubble.Core" Version="1.10.8" />
     <PackageReference Include="Stubble.Extensions.JsonNet" Version="1.2.3" />
   </ItemGroup>
@@ -25,19 +26,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore.Modules\OrchardCore.Contents\OrchardCore.Contents.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore.Modules\OrchardCore.Email\OrchardCore.Email.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore.Modules\OrchardCore.Queries\OrchardCore.Queries.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore.Modules\OrchardCore.Users\OrchardCore.Users.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore.Modules\OrchardCore.Workflows\OrchardCore.Workflows.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\OrchardCore.ContentManagement\OrchardCore.ContentManagement.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\OrchardCore.Data.Abstractions\OrchardCore.Data.Abstractions.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\OrchardCore.Data.YesSql.Abstractions\OrchardCore.Data.YesSql.Abstractions.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\OrchardCore.DisplayManagement\OrchardCore.DisplayManagement.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\OrchardCore.Media.Abstractions\OrchardCore.Media.Abstractions.csproj" />
-	  <ProjectReference Include="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\OrchardCore.Module.Targets\OrchardCore.Module.Targets.csproj" />
+		<PackageReference Include="Mjml.Net" Version="4.7.0" />
+		<PackageReference Include="NETCore.MailKit" Version="2.1.0" />
+		<PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+		<PackageReference Include="OrchardCore.Module.Targets" Version="2.1.4" />
+		<PackageReference Include="Stubble.Core" Version="1.10.8" />
+		<PackageReference Include="Stubble.Extensions.JsonNet" Version="1.2.3" />
+		<PackageReference Include="OrchardCore.Contents" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Email" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Queries" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Users" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Workflows" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.ContentManagement" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Data.Abstractions" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.1.4" />
+		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.1.4" />
 	</ItemGroup>
-	<Import Project="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\Directory.Build.props" />
-	<Import Project="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore.Build\OrchardCore.Commons.props" />
-	<Import Project="..\PropertyBrokersPortal\OrchardCore\src\OrchardCore\OrchardCore.Module.Targets\OrchardCore.Module.Targets.props" />
 </Project>
