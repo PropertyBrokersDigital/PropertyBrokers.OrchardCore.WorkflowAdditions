@@ -6,15 +6,6 @@
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/PropertyBrokersDigital/PropertyBrokers.OrchardCore.WorkflowAdditions</RepositoryUrl>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Mjml.Net" Version="4.7.0" />
-    <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
-    <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
-    <PackageReference Include="OrchardCore.Module.Targets" Version="2.1.4" />
-    <PackageReference Include="Stubble.Core" Version="1.10.8" />
-    <PackageReference Include="Stubble.Extensions.JsonNet" Version="1.2.3" />
-  </ItemGroup>
   
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
