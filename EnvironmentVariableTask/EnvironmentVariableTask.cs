@@ -11,6 +11,10 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable
 {
     public class EnvironmentVariableTask : TaskActivity
     {
+        private const string TrueOutcome = "True";
+        private const string FalseOutcome = "False";
+        private const string NotFoundOutcome = "NotFound";
+
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly IStringLocalizer S;
 
@@ -35,7 +39,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable
 
         public override IEnumerable<Outcome> GetPossibleOutcomes(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
         {
-            return Outcomes(S["True"], S["False"], S["NotFound"]);
+            return Outcomes(S[TrueOutcome], S[FalseOutcome], S[NotFoundOutcome]);
         }
 
         public override async Task<ActivityExecutionResult> ExecuteAsync(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
@@ -55,9 +59,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable
             if (variableValue == null)
             {
                 // Store the result in workflow context for potential use
-                workflowContext.Properties[$"{Name}_Result"] = "NotFound";
+                workflowContext.Properties[$"{Name}_Result"] = NotFoundOutcome;
                 workflowContext.Properties[$"{Name}_Value"] = null;
-                return Outcomes("NotFound");
+                return Outcomes(NotFoundOutcome);
             }
 
             // Check if the value is true/false (case-insensitive)
@@ -70,21 +74,36 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable
                            string.Equals(variableValue, "no", StringComparison.OrdinalIgnoreCase);
 
             // Store the result in workflow context for potential use
-            workflowContext.Properties[$"{Name}_Result"] = isTrue ? "True" : (isFalse ? "False" : variableValue);
+            string result;
+            if (isTrue)
+            {
+                result = TrueOutcome;
+            }
+            else if (isFalse)
+            {
+                result = FalseOutcome;
+            }
+            else
+            {
+                result = variableValue;
+            }
+            
+            workflowContext.Properties[$"{Name}_Result"] = result;
             workflowContext.Properties[$"{Name}_Value"] = variableValue;
 
             if (isTrue)
             {
-                return Outcomes("True");
+                return Outcomes(TrueOutcome);
             }
             else if (isFalse)
             {
-                return Outcomes("False");
+                return Outcomes(FalseOutcome);
             }
             else
             {
                 // If not a boolean value, return based on whether it has any value
-                return Outcomes(string.IsNullOrEmpty(variableValue) ? "False" : "True");
+                string outcome = string.IsNullOrEmpty(variableValue) ? FalseOutcome : TrueOutcome;
+                return Outcomes(outcome);
             }
         }
     }
