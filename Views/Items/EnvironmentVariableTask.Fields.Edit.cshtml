@@ -1,0 +1,9 @@
+@using PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable;
+@model EnvironmentVariableTaskViewModel
+
+<div class="form-group">
+    <label asp-for="VariableName">@T["Environment Variable Name"]</label>
+    <input asp-for="VariableName" class="form-control" />
+    <span class="hint">@T["The name of the environment variable to check. Default is 'Sync'. Supports Liquid expressions."]</span>
+    <span class="hint">@T["The task will check if the variable value is 'true', '1', 'yes' (returns True), 'false', '0', 'no' (returns False), or doesn't exist (returns NotFound)."]</span>
+</div>
