@@ -1,0 +1,6 @@
+@model OrchardCore.Workflows.ViewModels.ActivityViewModel<PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable.EnvironmentVariableTask>
+
+<header>
+    <h4><i class="fa fa-cog"></i>@Model.Activity.GetTitleOrDefault(() => T["Environment Variable"])</h4>
+</header>
+<em>@T["Check environment variable:"] <strong>@Model.Activity.VariableName.Expression</strong></em>
