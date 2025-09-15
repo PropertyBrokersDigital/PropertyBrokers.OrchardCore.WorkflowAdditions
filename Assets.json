@@ -1,3 +1,5 @@
 {
-  "Views/Items/AzureAISearchIndexTask.Edit.cshtml": "Views/Items/AzureAISearchIndexTask.Edit.cshtml"
+  "Views/Items/AzureAISearchIndexTask.Fields.Edit.cshtml": "Views/Items/AzureAISearchIndexTask.Fields.Edit.cshtml",
+  "Views/Items/AzureAISearchIndexTask.Fields.Design.cshtml": "Views/Items/AzureAISearchIndexTask.Fields.Design.cshtml",
+  "Views/Items/AzureAISearchIndexTask.Fields.Thumbnail.cshtml": "Views/Items/AzureAISearchIndexTask.Fields.Thumbnail.cshtml"
 }

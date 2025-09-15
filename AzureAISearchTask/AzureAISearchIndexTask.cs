@@ -1,7 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
+using OrchardCore.Indexing;
+using static OrchardCore.Indexing.DocumentIndexBase;
+using OrchardCore.Search.AzureAI.Models;
+using OrchardCore.Search.AzureAI.Services;
 using OrchardCore.Workflows.Abstractions.Models;
 using OrchardCore.Workflows.Activities;
 using OrchardCore.Workflows.Models;
@@ -12,36 +19,33 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
 {
     public class AzureAISearchIndexTask : TaskActivity
     {
-        private readonly IAzureAISearchService _azureAISearchService;
+        private readonly AzureAIIndexDocumentManager _documentManager;
+        private readonly AzureAISearchIndexManager _indexManager;
+        private readonly AzureAISearchIndexSettingsService _indexSettingsService;
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly IStringLocalizer S;
+        private readonly ILogger<AzureAISearchIndexTask> _logger;
 
         public AzureAISearchIndexTask(
-            IAzureAISearchService azureAISearchService,
+            AzureAIIndexDocumentManager documentManager,
+            AzureAISearchIndexManager indexManager,
+            AzureAISearchIndexSettingsService indexSettingsService,
             IWorkflowExpressionEvaluator expressionEvaluator,
-            IStringLocalizer<AzureAISearchIndexTask> localizer
+            IStringLocalizer<AzureAISearchIndexTask> localizer,
+            ILogger<AzureAISearchIndexTask> logger
         )
         {
-            _azureAISearchService = azureAISearchService;
+            _documentManager = documentManager;
+            _indexManager = indexManager;
+            _indexSettingsService = indexSettingsService;
             _expressionEvaluator = expressionEvaluator;
             S = localizer;
+            _logger = logger;
         }
 
         public override string Name => nameof(AzureAISearchIndexTask);
         public override LocalizedString DisplayText => S["Azure AI Search Index Task"];
         public override LocalizedString Category => S["Search"];
-
-        public WorkflowExpression<string> SearchServiceUrl
-        {
-            get => GetProperty(() => new WorkflowExpression<string>());
-            set => SetProperty(value);
-        }
-
-        public WorkflowExpression<string> ApiKey
-        {
-            get => GetProperty(() => new WorkflowExpression<string>());
-            set => SetProperty(value);
-        }
 
         public WorkflowExpression<string> IndexName
         {
@@ -76,26 +80,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
         {
             try
             {
-                var searchServiceUrl = await _expressionEvaluator.EvaluateAsync(SearchServiceUrl, workflowContext, null);
-                var apiKey = await _expressionEvaluator.EvaluateAsync(ApiKey, workflowContext, null);
                 var indexName = await _expressionEvaluator.EvaluateAsync(IndexName, workflowContext, null);
                 var documentId = await _expressionEvaluator.EvaluateAsync(DocumentId, workflowContext, null);
                 var jsonPayload = await _expressionEvaluator.EvaluateAsync(JsonPayload, workflowContext, null);
 
-                var urlValidation = AzureAISearchIndexValidator.ValidateSearchServiceUrl(searchServiceUrl);
-                if (!urlValidation.IsValid)
-                {
-                    workflowContext.LastResult = new { Error = urlValidation.ErrorMessage };
-                    return Outcomes("ValidationFailed");
-                }
-
-                var apiKeyValidation = AzureAISearchIndexValidator.ValidateApiKey(apiKey);
-                if (!apiKeyValidation.IsValid)
-                {
-                    workflowContext.LastResult = new { Error = apiKeyValidation.ErrorMessage };
-                    return Outcomes("ValidationFailed");
-                }
-
+                // Validate inputs
                 var indexNameValidation = AzureAISearchIndexValidator.ValidateIndexName(indexName);
                 if (!indexNameValidation.IsValid)
                 {
@@ -110,20 +99,35 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
                     return Outcomes("ValidationFailed");
                 }
 
-                bool indexExists = await _azureAISearchService.IndexExistsAsync(searchServiceUrl, apiKey, indexName);
+                _logger.LogInformation("Starting Azure AI Search indexing for index: {IndexName}", indexName);
+
+                // Check if index exists and get settings
+                var indexSettings = await _indexSettingsService.GetAsync(indexName);
                 bool indexCreated = false;
 
-                if (!indexExists)
+                if (indexSettings == null)
                 {
                     if (CreateIndexIfNotExists)
                     {
-                        var createResult = await _azureAISearchService.CreateIndexAsync(searchServiceUrl, apiKey, indexName);
-                        if (!createResult.IsSuccess)
+                        // Create a basic index with minimal settings
+                        indexSettings = new AzureAISearchIndexSettings
                         {
-                            workflowContext.LastResult = new { Error = createResult.ErrorMessage };
-                            return Outcomes("Failed");
+                            IndexName = indexName,
+                            AnalyzerName = "standard.lucene",
+                            IndexLatest = false,
+                            IndexedContentTypes = new string[0] // Empty array for generic indexing
+                        };
+
+                        var indexExists = await _indexManager.ExistsAsync(indexName);
+                        if (!indexExists)
+                        {
+                            await _indexManager.CreateAsync(indexSettings);
+                            indexCreated = true;
+                            _logger.LogInformation("Created new Azure AI Search index: {IndexName}", indexName);
                         }
-                        indexCreated = true;
+
+                        // Save the index settings
+                        await _indexSettingsService.UpdateAsync(indexSettings);
                     }
                     else
                     {
@@ -132,30 +136,96 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
                     }
                 }
 
-                var result = await _azureAISearchService.IndexDocumentAsync(searchServiceUrl, apiKey, indexName, documentId, jsonPayload);
+                // Convert JSON to DocumentIndex
+                var documentIndex = ConvertJsonToDocumentIndex(jsonPayload, documentId);
 
-                if (result.IsSuccess)
-                {
-                    workflowContext.LastResult = new 
-                    { 
-                        DocumentKey = result.DocumentKey, 
-                        IndexCreated = indexCreated,
-                        IndexName = indexName
-                    };
+                // Upload document using OrchardCore's service
+                await _documentManager.UploadDocumentsAsync(indexName, new[] { documentIndex }, indexSettings);
 
-                    return indexCreated ? Outcomes("IndexCreated") : Outcomes("Success");
-                }
-                else
+                var finalDocumentId = documentIndex.ContentItemId;
+                _logger.LogInformation("Successfully indexed document with ID: {DocumentId} to index: {IndexName}", finalDocumentId, indexName);
+
+                workflowContext.LastResult = new
                 {
-                    workflowContext.LastResult = new { Error = result.ErrorMessage };
-                    return Outcomes("Failed");
-                }
+                    DocumentKey = finalDocumentId,
+                    IndexCreated = indexCreated,
+                    IndexName = indexName
+                };
+
+                return indexCreated ? Outcomes("IndexCreated") : Outcomes("Success");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error indexing document to Azure AI Search");
                 workflowContext.LastResult = new { Error = ex.Message };
                 return Outcomes("Failed");
             }
+        }
+
+        private DocumentIndex ConvertJsonToDocumentIndex(string jsonPayload, string documentId)
+        {
+            using var document = JsonDocument.Parse(jsonPayload);
+            
+            // Use provided document ID or generate one
+            var finalDocumentId = !string.IsNullOrWhiteSpace(documentId) 
+                ? documentId 
+                : Guid.NewGuid().ToString();
+
+            var documentIndex = new DocumentIndex(finalDocumentId, finalDocumentId);
+
+            // Convert JSON properties to DocumentIndexEntry objects
+            foreach (var property in document.RootElement.EnumerateObject())
+            {
+                if (property.Name.ToLowerInvariant() == "id" && string.IsNullOrWhiteSpace(documentId))
+                {
+                    // Use ID from JSON if no explicit document ID was provided
+                    var idValue = GetPropertyValue(property.Value);
+                    if (idValue != null)
+                    {
+                        finalDocumentId = idValue.ToString();
+                        documentIndex = new DocumentIndex(finalDocumentId, finalDocumentId);
+                    }
+                    continue;
+                }
+
+                var value = GetPropertyValue(property.Value);
+                if (value != null)
+                {
+                    var entry = CreateDocumentIndexEntry(property.Name, value);
+                    documentIndex.Entries.Add(entry);
+                }
+            }
+
+            return documentIndex;
+        }
+
+        private object GetPropertyValue(JsonElement element)
+        {
+            return element.ValueKind switch
+            {
+                JsonValueKind.String => element.GetString(),
+                JsonValueKind.Number => element.TryGetInt32(out var intValue) ? intValue : element.GetDouble(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Array => element.EnumerateArray().Select(GetPropertyValue).ToArray(),
+                JsonValueKind.Object => element.GetRawText(),
+                JsonValueKind.Null => null,
+                _ => element.GetRawText()
+            };
+        }
+
+        private DocumentIndexEntry CreateDocumentIndexEntry(string name, object value)
+        {
+            return value switch
+            {
+                bool boolValue => new DocumentIndexEntry(name, boolValue, Types.Boolean, DocumentIndexOptions.Store),
+                int intValue => new DocumentIndexEntry(name, intValue, Types.Integer, DocumentIndexOptions.Store),
+                long longValue => new DocumentIndexEntry(name, longValue, Types.Integer, DocumentIndexOptions.Store),
+                double doubleValue => new DocumentIndexEntry(name, doubleValue, Types.Number, DocumentIndexOptions.Store),
+                DateTime dateTimeValue => new DocumentIndexEntry(name, dateTimeValue, Types.DateTime, DocumentIndexOptions.Store),
+                DateTimeOffset dateTimeOffsetValue => new DocumentIndexEntry(name, dateTimeOffsetValue, Types.DateTime, DocumentIndexOptions.Store),
+                _ => new DocumentIndexEntry(name, value.ToString(), Types.Text, DocumentIndexOptions.Store)
+            };
         }
     }
 }

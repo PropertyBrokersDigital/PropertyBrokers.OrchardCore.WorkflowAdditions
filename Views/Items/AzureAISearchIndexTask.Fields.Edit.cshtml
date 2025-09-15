@@ -1,0 +1,69 @@
+@using PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask;
+@model AzureAISearchIndexTaskViewModel
+
+<div class="alert alert-info">
+    <strong>@T["Configuration Required"]:</strong>
+    @T["Azure AI Search must be configured in OrchardCore settings before using this workflow activity. Go to Configuration > Settings > Azure AI Search to set up your service connection."]
+</div>
+
+<div class="form-group" asp-validation-class-for="IndexNameExpression">
+    <label asp-for="IndexNameExpression">@T["Index Name"]</label>
+    <input type="text" asp-for="IndexNameExpression" class="form-control code" placeholder="my-search-index" />
+    <span asp-validation-for="IndexNameExpression"></span>
+    <span class="hint">@T["Index name must be 2-128 characters, lowercase, letters/numbers/dashes/underscores only. Must start and end with letter or number. With Liquid support."]</span>
+</div>
+
+<div class="form-group" asp-validation-class-for="DocumentIdExpression">
+    <label asp-for="DocumentIdExpression">@T["Document ID"] <em class="text-muted">(@T["Optional"])</em></label>
+    <input type="text" asp-for="DocumentIdExpression" class="form-control code" placeholder="Leave empty for auto-generated ID" />
+    <span asp-validation-for="DocumentIdExpression"></span>
+    <span class="hint">@T["Unique identifier for the document. If empty, a GUID will be generated. With Liquid support."]</span>
+</div>
+
+<div class="form-group" asp-validation-class-for="JsonPayloadExpression">
+    <label asp-for="JsonPayloadExpression">@T["JSON Payload"]</label>
+    <textarea asp-for="JsonPayloadExpression" rows="10" class="form-control" placeholder='{"title": "Document Title", "content": "Document content", "category": "News"}'></textarea>
+    <span asp-validation-for="JsonPayloadExpression"></span>
+    <span class="hint">@T["JSON document to index. Common fields: title, content, category, tags, createdDate. With Liquid support."]</span>
+</div>
+
+<div class="form-group">
+    <div class="custom-control custom-checkbox">
+        <input type="checkbox" class="custom-control-input" asp-for="CreateIndexIfNotExists" />
+        <label class="custom-control-label" asp-for="CreateIndexIfNotExists">@T["Create index if it doesn't exist"]</label>
+        <span class="hint dashed">@T["If enabled, the index will be created automatically with a default schema if it doesn't exist."]</span>
+    </div>
+</div>
+
+<style asp-name="codemirror"></style>
+<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror-mode-javascript" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-multiplex" at="Foot"></script>
+<script asp-name="codemirror-mode-xml" at="Foot"></script>
+<script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
+
+<script at="Foot">
+$(function () {
+    var indexNameEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.IndexNameExpression)'), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        mode: { name: "liquid" },
+    });
+    
+    var documentIdEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.DocumentIdExpression)'), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        mode: { name: "liquid" },
+    });
+
+    var jsonPayloadEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.JsonPayloadExpression)'), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        mode: { name: "liquid" },
+    });
+});
+</script>

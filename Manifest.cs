@@ -75,6 +75,6 @@ using OrchardCore.Modules.Manifest;
     Id = Constants.Features.AzureAISearchIndex,
     Name = "Azure AI Search Index",
     Category = "Workflows",
-    Dependencies = new[] { "OrchardCore.Workflows" },
+    Dependencies = new[] { "OrchardCore.Workflows", "OrchardCore.Search.AzureAI" },
     Description = "Index data to Azure AI Search service"
 )]
