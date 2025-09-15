@@ -71,3 +71,10 @@ using OrchardCore.Modules.Manifest;
     Description = "Adds Google Tag Manager integration to workflows.",
     Category = "Analytics"
 )]
+[assembly: Feature(
+    Id = Constants.Features.AzureAISearchIndex,
+    Name = "Azure AI Search Index",
+    Category = "Workflows",
+    Dependencies = new[] { "OrchardCore.Workflows" },
+    Description = "Index data to Azure AI Search service"
+)]

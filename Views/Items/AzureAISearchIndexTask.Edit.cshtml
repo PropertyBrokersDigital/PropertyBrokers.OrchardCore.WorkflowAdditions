@@ -1,0 +1,76 @@
+@model PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask.AzureAISearchIndexTaskViewModel
+
+<div class="form-group">
+    <label asp-for="SearchServiceUrlExpression" class="form-label">@T["Search Service URL"]</label>
+    <input asp-for="SearchServiceUrlExpression" class="form-control" placeholder="https://your-service.search.windows.net" />
+    <span class="hint">@T["Enter the Azure AI Search service URL (e.g., https://your-service.search.windows.net)"]</span>
+</div>
+
+<div class="form-group">
+    <label asp-for="ApiKeyExpression" class="form-label">@T["API Key"]</label>
+    <input asp-for="ApiKeyExpression" type="password" class="form-control" placeholder="Admin or Query API Key" />
+    <span class="hint">@T["Enter the Azure AI Search admin or query API key"]</span>
+</div>
+
+<div class="form-group">
+    <label asp-for="IndexNameExpression" class="form-label">@T["Index Name"]</label>
+    <input asp-for="IndexNameExpression" class="form-control" placeholder="my-search-index" />
+    <span class="hint">@T["Index name must be 2-128 characters, lowercase, letters/numbers/dashes/underscores only. Must start and end with letter or number."]</span>
+</div>
+
+<div class="form-group">
+    <label asp-for="DocumentIdExpression" class="form-label">@T["Document ID"] <em class="text-muted">(@T["Optional"])</em></label>
+    <input asp-for="DocumentIdExpression" class="form-control" placeholder="Leave empty for auto-generated ID" />
+    <span class="hint">@T["Unique identifier for the document. If empty, a GUID will be generated."]</span>
+</div>
+
+<div class="form-group">
+    <label asp-for="JsonPayloadExpression" class="form-label">@T["JSON Payload"]</label>
+    <textarea asp-for="JsonPayloadExpression" class="form-control" rows="10" placeholder='{"title": "Document Title", "content": "Document content", "category": "News"}'></textarea>
+    <span class="hint">@T["JSON document to index. Common fields: title, content, category, tags, createdDate"]</span>
+</div>
+
+<div class="form-group">
+    <div class="form-check">
+        <input asp-for="CreateIndexIfNotExists" type="checkbox" class="form-check-input" />
+        <label asp-for="CreateIndexIfNotExists" class="form-check-label">@T["Create index if it doesn't exist"]</label>
+    </div>
+    <span class="hint">@T["If enabled, the index will be created automatically with a default schema if it doesn't exist."]</span>
+</div>
+
+<script at="Foot" type="text/javascript">
+//<![CDATA[
+    document.addEventListener('DOMContentLoaded', function() {
+        const indexNameInput = document.querySelector('input[name="IndexNameExpression"]');
+        const jsonPayloadTextarea = document.querySelector('textarea[name="JsonPayloadExpression"]');
+        
+        if (indexNameInput) {
+            indexNameInput.addEventListener('input', function() {
+                const value = this.value;
+                const isValid = /^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$/.test(value) && 
+                               value.length >= 2 && value.length <= 128 &&
+                               !/[_-]{2,}/.test(value);
+                
+                if (value && !isValid) {
+                    this.style.borderColor = '#dc3545';
+                } else {
+                    this.style.borderColor = '';
+                }
+            });
+        }
+        
+        if (jsonPayloadTextarea) {
+            jsonPayloadTextarea.addEventListener('blur', function() {
+                try {
+                    if (this.value.trim()) {
+                        JSON.parse(this.value);
+                        this.style.borderColor = '';
+                    }
+                } catch (e) {
+                    this.style.borderColor = '#dc3545';
+                }
+            });
+        }
+    });
+//]]>
+</script>

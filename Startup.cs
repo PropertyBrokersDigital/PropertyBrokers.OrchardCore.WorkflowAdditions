@@ -18,6 +18,8 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.Services;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
 {
@@ -37,6 +39,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskDisplayDriver>();
             services.AddActivity<SaveFileToMediaTask, SaveFileToMediaTaskDisplayDriver>();
             services.AddActivity<EnvironmentVariableTask, EnvironmentVariableTaskDisplayDriver>();
+            services.AddActivity<AzureAISearchIndexTask, AzureAISearchIndexTaskDisplayDriver>();
+            services.AddScoped<IAzureAISearchService, AzureAISearchService>();
 
         }
 
