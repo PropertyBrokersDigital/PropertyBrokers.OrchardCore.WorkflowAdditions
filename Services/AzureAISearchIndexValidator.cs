@@ -5,8 +5,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.Services
 {
     public static class AzureAISearchIndexValidator
     {
-        private static readonly Regex ValidIndexNameRegex = new Regex("^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$", RegexOptions.Compiled);
-        private static readonly Regex ConsecutiveSpecialCharsRegex = new Regex("[_-]{2,}", RegexOptions.Compiled);
+        private static readonly Regex ValidIndexNameRegex = new Regex("^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+        private static readonly Regex ConsecutiveSpecialCharsRegex = new Regex("[_-]{2,}", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
         public static ValidationResult ValidateIndexName(string indexName)
         {
