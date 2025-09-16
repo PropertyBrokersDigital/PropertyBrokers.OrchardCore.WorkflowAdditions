@@ -2,8 +2,8 @@
 @model AzureAISearchIndexTaskViewModel
 
 <div class="alert alert-info">
-    <strong>@T["Configuration Required"]:</strong>
-    @T["Azure AI Search must be configured in OrchardCore settings before using this workflow activity. Go to Configuration > Settings > Azure AI Search to set up your service connection."]
+    <strong>@T["Azure AI Search Index Creation"]:</strong>
+    @T["This workflow will create an index in Azure AI Search and upload documents directly to your Azure service."]
 </div>
 
 <div class="form-group" asp-validation-class-for="IndexNameExpression">
@@ -13,19 +13,34 @@
     <span class="hint">@T["Index name must be 2-128 characters, lowercase, letters/numbers/dashes/underscores only. Must start and end with letter or number. With Liquid support."]</span>
 </div>
 
-<div class="form-group" asp-validation-class-for="DocumentIdExpression">
-    <label asp-for="DocumentIdExpression">@T["Document ID"] <em class="text-muted">(@T["Optional"])</em></label>
-    <input type="text" asp-for="DocumentIdExpression" class="form-control code" placeholder="Leave empty for auto-generated ID" />
-    <span asp-validation-for="DocumentIdExpression"></span>
-    <span class="hint">@T["Unique identifier for the document. If empty, a GUID will be generated. With Liquid support."]</span>
-</div>
 
 <div class="form-group" asp-validation-class-for="JsonPayloadExpression">
     <label asp-for="JsonPayloadExpression">@T["JSON Payload"]</label>
-    <textarea asp-for="JsonPayloadExpression" rows="10" class="form-control" placeholder='{"title": "Document Title", "content": "Document content", "category": "News"}'></textarea>
+    <textarea asp-for="JsonPayloadExpression" rows="10" class="form-control" placeholder='{"id": "1235", "Content": "Main document content", "Keywords": "test, azure", "Author": "John Doe"}'></textarea>
     <span asp-validation-for="JsonPayloadExpression"></span>
-    <span class="hint">@T["JSON document to index. Common fields: title, content, category, tags, createdDate. With Liquid support."]</span>
+    <span class="hint">@T["JSON document to index. Must include 'id' field. Supported fields: id, Content, Keywords, Author. With Liquid support."]</span>
 </div>
+
+<hr class="my-4" />
+
+<h6 class="text-muted">@T["Azure AI Search Configuration"]</h6>
+<p class="text-muted small">@T["Both Service Endpoint and API Key are required for this workflow task."]</p>
+
+<div class="form-group" asp-validation-class-for="ServiceEndpointExpression">
+    <label asp-for="ServiceEndpointExpression">@T["Service Endpoint"]</label>
+    <input type="text" asp-for="ServiceEndpointExpression" class="form-control code" placeholder="https://your-service.search.windows.net" />
+    <span asp-validation-for="ServiceEndpointExpression"></span>
+    <span class="hint">@T["Azure AI Search service endpoint URL. With Liquid support."]</span>
+</div>
+
+<div class="form-group" asp-validation-class-for="ApiKeyExpression">
+    <label asp-for="ApiKeyExpression">@T["API Key"]</label>
+    <input type="text" asp-for="ApiKeyExpression" class="form-control code" placeholder="Your Azure AI Search admin key" />
+    <span asp-validation-for="ApiKeyExpression"></span>
+    <span class="hint">@T["Azure AI Search admin API key. With Liquid support."]</span>
+</div>
+
+<hr class="my-4" />
 
 <div class="form-group">
     <div class="custom-control custom-checkbox">
@@ -52,14 +67,22 @@ $(function () {
         mode: { name: "liquid" },
     });
     
-    var documentIdEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.DocumentIdExpression)'), {
+
+    var jsonPayloadEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.JsonPayloadExpression)'), {
         lineNumbers: true,
         styleActiveLine: true,
         matchBrackets: true,
         mode: { name: "liquid" },
     });
-
-    var jsonPayloadEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.JsonPayloadExpression)'), {
+    
+    var serviceEndpointEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.ServiceEndpointExpression)'), {
+        lineNumbers: true,
+        styleActiveLine: true,
+        matchBrackets: true,
+        mode: { name: "liquid" },
+    });
+    
+    var apiKeyEditor = CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.ApiKeyExpression)'), {
         lineNumbers: true,
         styleActiveLine: true,
         matchBrackets: true,
