@@ -7,16 +7,16 @@
 </div>
 
 <div class="form-group" asp-validation-class-for="IndexNameExpression">
-    <label asp-for="IndexNameExpression">@T["Index Name"]</label>
-    <input type="text" asp-for="IndexNameExpression" class="form-control code" placeholder="my-search-index" />
+    <label asp-for="IndexNameExpression" for="@Html.IdFor(x => x.IndexNameExpression)">@T["Index Name"]</label>
+    <input type="text" asp-for="IndexNameExpression" id="@Html.IdFor(x => x.IndexNameExpression)" class="form-control code" placeholder="my-search-index" />
     <span asp-validation-for="IndexNameExpression"></span>
     <span class="hint">@T["Index name must be 2-128 characters, lowercase, letters/numbers/dashes/underscores only. Must start and end with letter or number. With Liquid support."]</span>
 </div>
 
 
 <div class="form-group" asp-validation-class-for="JsonPayloadExpression">
-    <label asp-for="JsonPayloadExpression">@T["JSON Payload"]</label>
-    <textarea asp-for="JsonPayloadExpression" rows="10" class="form-control" placeholder='{"id": "1235", "Content": "Main document content", "Keywords": "test, azure", "Author": "John Doe"}'></textarea>
+    <label asp-for="JsonPayloadExpression" for="@Html.IdFor(x => x.JsonPayloadExpression)">@T["JSON Payload"]</label>
+    <textarea asp-for="JsonPayloadExpression" id="@Html.IdFor(x => x.JsonPayloadExpression)" rows="10" class="form-control" placeholder='{"id": "1235", "Content": "Main document content", "Keywords": "test, azure", "Author": "John Doe"}'></textarea>
     <span asp-validation-for="JsonPayloadExpression"></span>
     <span class="hint">@T["JSON document to index. Must include 'id' field. Supported fields: id, Content, Keywords, Author. With Liquid support."]</span>
 </div>
@@ -27,15 +27,15 @@
 <p class="text-muted small">@T["Both Service Endpoint and API Key are required for this workflow task."]</p>
 
 <div class="form-group" asp-validation-class-for="ServiceEndpointExpression">
-    <label asp-for="ServiceEndpointExpression">@T["Service Endpoint"]</label>
-    <input type="text" asp-for="ServiceEndpointExpression" class="form-control code" placeholder="https://your-service.search.windows.net" />
+    <label asp-for="ServiceEndpointExpression" for="@Html.IdFor(x => x.ServiceEndpointExpression)">@T["Service Endpoint"]</label>
+    <input type="text" asp-for="ServiceEndpointExpression" id="@Html.IdFor(x => x.ServiceEndpointExpression)" class="form-control code" placeholder="https://your-service.search.windows.net" />
     <span asp-validation-for="ServiceEndpointExpression"></span>
     <span class="hint">@T["Azure AI Search service endpoint URL. With Liquid support."]</span>
 </div>
 
 <div class="form-group" asp-validation-class-for="ApiKeyExpression">
-    <label asp-for="ApiKeyExpression">@T["API Key"]</label>
-    <input type="text" asp-for="ApiKeyExpression" class="form-control code" placeholder="Your Azure AI Search admin key" />
+    <label asp-for="ApiKeyExpression" for="@Html.IdFor(x => x.ApiKeyExpression)">@T["API Key"]</label>
+    <input type="text" asp-for="ApiKeyExpression" id="@Html.IdFor(x => x.ApiKeyExpression)" class="form-control code" placeholder="Your Azure AI Search admin key" />
     <span asp-validation-for="ApiKeyExpression"></span>
     <span class="hint">@T["Azure AI Search admin API key. With Liquid support."]</span>
 </div>
@@ -44,8 +44,8 @@
 
 <div class="form-group">
     <div class="custom-control custom-checkbox">
-        <input type="checkbox" class="custom-control-input" asp-for="CreateIndexIfNotExists" />
-        <label class="custom-control-label" asp-for="CreateIndexIfNotExists">@T["Create index if it doesn't exist"]</label>
+        <input type="checkbox" class="custom-control-input" asp-for="CreateIndexIfNotExists" id="@Html.IdFor(x => x.CreateIndexIfNotExists)" />
+        <label class="custom-control-label" asp-for="CreateIndexIfNotExists" for="@Html.IdFor(x => x.CreateIndexIfNotExists)">@T["Create index if it doesn't exist"]</label>
         <span class="hint dashed">@T["If enabled, the index will be created automatically with a default schema if it doesn't exist."]</span>
     </div>
 </div>

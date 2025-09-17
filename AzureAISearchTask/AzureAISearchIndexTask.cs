@@ -20,6 +20,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
 {
     public class AzureAISearchIndexTask : TaskActivity
     {
+        private const string ValidationFailedOutcome = "ValidationFailed";
+        private const string SuccessOutcome = "Success";
+        private const string IndexCreatedOutcome = "IndexCreated";
+        private const string FailedOutcome = "Failed";
+
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
         private readonly IStringLocalizer S;
         private readonly ILogger<AzureAISearchIndexTask> _logger;
@@ -72,7 +77,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
 
         public override IEnumerable<Outcome> GetPossibleOutcomes(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
         {
-            return Outcomes(S["Success"], S["ValidationFailed"], S["IndexCreated"], S["Failed"]);
+            return Outcomes(S[SuccessOutcome], S[ValidationFailedOutcome], S[IndexCreatedOutcome], S[FailedOutcome]);
         }
 
         public override async Task<ActivityExecutionResult> ExecuteAsync(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
@@ -89,28 +94,28 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
                 if (!indexNameValidation.IsValid)
                 {
                     workflowContext.LastResult = new { Error = indexNameValidation.ErrorMessage };
-                    return Outcomes("ValidationFailed");
+                    return Outcomes(ValidationFailedOutcome);
                 }
 
                 var jsonValidation = AzureAISearchIndexValidator.ValidateJsonPayload(jsonPayload);
                 if (!jsonValidation.IsValid)
                 {
                     workflowContext.LastResult = new { Error = jsonValidation.ErrorMessage };
-                    return Outcomes("ValidationFailed");
+                    return Outcomes(ValidationFailedOutcome);
                 }
 
                 var endpointValidation = AzureAISearchIndexValidator.ValidateSearchServiceUrl(serviceEndpoint);
                 if (!endpointValidation.IsValid)
                 {
                     workflowContext.LastResult = new { Error = endpointValidation.ErrorMessage };
-                    return Outcomes("ValidationFailed");
+                    return Outcomes(ValidationFailedOutcome);
                 }
 
                 var apiKeyValidation = AzureAISearchIndexValidator.ValidateApiKey(apiKey);
                 if (!apiKeyValidation.IsValid)
                 {
                     workflowContext.LastResult = new { Error = apiKeyValidation.ErrorMessage };
-                    return Outcomes("ValidationFailed");
+                    return Outcomes(ValidationFailedOutcome);
                 }
 
                 _logger.LogInformation("Starting Azure AI Search indexing for index: {IndexName}", indexName);
@@ -152,13 +157,13 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
                     IndexName = indexName
                 };
 
-                return indexCreated ? Outcomes("IndexCreated") : Outcomes("Success");
+                return indexCreated ? Outcomes(IndexCreatedOutcome) : Outcomes(SuccessOutcome);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error indexing document to Azure AI Search");
                 workflowContext.LastResult = new { Error = ex.Message };
-                return Outcomes("Failed");
+                return Outcomes(FailedOutcome);
             }
         }
 
@@ -177,10 +182,16 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
             {
                 return false;
             }
+            catch (Azure.RequestFailedException ex)
+            {
+                _logger.LogError(ex, "Azure service error while checking index existence. Index: {IndexName}, Status: {Status}, ErrorCode: {ErrorCode}", 
+                    indexName, ex.Status, ex.ErrorCode);
+                throw new InvalidOperationException($"Failed to check if Azure AI Search index '{indexName}' exists: {ex.ErrorCode}", ex);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking if index exists: {IndexName}", indexName);
-                throw;
+                _logger.LogError(ex, "Unexpected error while checking if index exists: {IndexName}", indexName);
+                throw new InvalidOperationException($"Failed to check if Azure AI Search index '{indexName}' exists", ex);
             }
         }
 
@@ -206,10 +217,16 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
                 await searchIndexClient.CreateIndexAsync(searchIndex);
                 _logger.LogInformation("Successfully created Azure AI Search index directly: {IndexName}", indexName);
             }
+            catch (Azure.RequestFailedException ex)
+            {
+                _logger.LogError(ex, "Azure service error while creating index. Index: {IndexName}, Status: {Status}, ErrorCode: {ErrorCode}", 
+                    indexName, ex.Status, ex.ErrorCode);
+                throw new InvalidOperationException($"Failed to create Azure AI Search index '{indexName}': {ex.ErrorCode}", ex);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to create Azure AI Search index directly: {IndexName}", indexName);
-                throw;
+                _logger.LogError(ex, "Unexpected error while creating Azure AI Search index: {IndexName}", indexName);
+                throw new InvalidOperationException($"Failed to create Azure AI Search index '{indexName}'", ex);
             }
         }
 
@@ -225,10 +242,16 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask
                 await searchClient.IndexDocumentsAsync(batch);
                 _logger.LogInformation("Successfully uploaded document to Azure AI Search index: {IndexName}", indexName);
             }
+            catch (Azure.RequestFailedException ex)
+            {
+                _logger.LogError(ex, "Azure service error while uploading document. Index: {IndexName}, Status: {Status}, ErrorCode: {ErrorCode}", 
+                    indexName, ex.Status, ex.ErrorCode);
+                throw new InvalidOperationException($"Failed to upload document to Azure AI Search index '{indexName}': {ex.ErrorCode}", ex);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to upload document to Azure AI Search index: {IndexName}", indexName);
-                throw;
+                _logger.LogError(ex, "Unexpected error while uploading document to Azure AI Search index: {IndexName}", indexName);
+                throw new InvalidOperationException($"Failed to upload document to Azure AI Search index '{indexName}'", ex);
             }
         }
 
