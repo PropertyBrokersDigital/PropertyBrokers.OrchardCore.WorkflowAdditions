@@ -1,0 +1,15 @@
+@model OrchardCore.Workflows.ViewModels.ActivityViewModel<PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask.AzureAISearchIndexTask>
+@using OrchardCore.Workflows.Helpers
+
+<header>
+    <h4><i class="fa fa-search" aria-hidden="true"></i>@Model.Activity.GetTitleOrDefault(() => T["Azure AI Search Index"])</h4>
+</header>
+<div>
+    <strong>@T["Index"]:</strong> <em>@Model.Activity.IndexName.Expression</em>
+</div>
+@if (!string.IsNullOrEmpty(Model.Activity.ServiceEndpoint.Expression))
+{
+    <div>
+        <strong>@T["Custom Endpoint"]:</strong> <em>@Model.Activity.ServiceEndpoint.Expression</em>
+    </div>
+}

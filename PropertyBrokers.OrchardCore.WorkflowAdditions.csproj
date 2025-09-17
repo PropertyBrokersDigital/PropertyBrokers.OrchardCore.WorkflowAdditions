@@ -33,5 +33,6 @@
 		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="2.1.7" />
 		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.1.7" />
 		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.1.7" />
+		<PackageReference Include="OrchardCore.Search.AzureAI.Core" Version="2.1.7" />
 	</ItemGroup>
 </Project>

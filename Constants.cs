@@ -19,6 +19,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             public const string GenerateSecureUrlToken = "PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken";
             public const string SaveFileToMedia = "PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia";
             public const string GoogleTagManager = "PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleTagManager";
+            public const string AzureAISearchIndex = "PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchIndex";
         }
     }
 }
