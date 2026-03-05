@@ -147,9 +147,11 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             var body = await _expressionEvaluator.EvaluateAsync(Body, workflowContext, IsBodyHtml ? _htmlEncoder : null);
 
             // Use workflow Author/Sender if provided, fall back to appsettings
-            var fromAddress = !string.IsNullOrWhiteSpace(author) ? author.Trim()
-                : !string.IsNullOrWhiteSpace(sender) ? sender.Trim()
-                : _emailSettings.FromAddress;
+            var fromAddress = _emailSettings.FromAddress;
+            if (!string.IsNullOrWhiteSpace(author))
+                fromAddress = author.Trim();
+            else if (!string.IsNullOrWhiteSpace(sender))
+                fromAddress = sender.Trim();
 
             var message = new SendEmailRequest
             {
