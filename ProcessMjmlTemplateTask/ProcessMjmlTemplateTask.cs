@@ -1,16 +1,13 @@
 ﻿using Microsoft.Extensions.Localization;
-using Mjml.Net;
 using Newtonsoft.Json.Linq;
 using OrchardCore.Workflows.Abstractions.Models;
 using OrchardCore.Workflows.Activities;
 using OrchardCore.Workflows.Models;
 using OrchardCore.Workflows.Services;
+using PropertyBrokers.OrchardCore.EmailTemplating.Services;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile;
-using Stubble.Core.Builders;
-using Stubble.Extensions.JsonNet;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Stubble.Core.Settings;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
 {
@@ -18,13 +15,17 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
     public class ProcessMjmlTemplateTask : TaskActivity
     {
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
+        private readonly IMjmlTemplateService _mjmlTemplateService;
         private readonly IStringLocalizer S;
+
         public ProcessMjmlTemplateTask(
             IWorkflowExpressionEvaluator expressionEvaluator,
+            IMjmlTemplateService mjmlTemplateService,
             IStringLocalizer<EmailFileTask> localizer
         )
         {
             _expressionEvaluator = expressionEvaluator;
+            _mjmlTemplateService = mjmlTemplateService;
             S = localizer;
         }
 
@@ -57,22 +58,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
 
             string mjmlTemplate = await _expressionEvaluator.EvaluateAsync(EmailTemplateContent, workflowContext, null);
 
-            var builder = new StubbleBuilder().Configure(settings => settings.AddJsonNet()).Build();
+            var html = await _mjmlTemplateService.ProcessMjmlTemplateAsync(mjmlTemplate, mergeTags);
 
-           string parsedMustacheTemplate = await builder.RenderAsync(mjmlTemplate, mergeTags, new RenderSettings
-            {
-                SkipHtmlEncoding = true
-            });
-            MjmlRenderer mjmlRenderer = new();
-            MjmlOptions mjmlOptions = new()
-            {
-                Beautify = true
-            };
-
-            // errors don't prevent build, usually related to mjml attributes
-            // if there is a real error, it should either fault, or be VERY obvious otherwise
-            var (html, errors) = mjmlRenderer.Render(parsedMustacheTemplate, mjmlOptions);
-            
             workflowContext.Properties["ProcessMjmlTemplateTaskOutput"] = html;
             return Outcomes("Done");
         }

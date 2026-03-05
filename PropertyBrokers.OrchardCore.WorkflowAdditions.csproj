@@ -17,12 +17,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Mjml.Net" Version="4.8.0" />
 		<PackageReference Include="NETCore.MailKit" Version="2.1.0" />
 		<PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
 		<PackageReference Include="OrchardCore.Module.Targets" Version="2.1.7" />
-		<PackageReference Include="Stubble.Core" Version="1.10.8" />
-		<PackageReference Include="Stubble.Extensions.JsonNet" Version="1.2.3" />
 		<PackageReference Include="OrchardCore.Contents" Version="2.1.7" />
 		<PackageReference Include="OrchardCore.Email" Version="2.1.7" />
 		<PackageReference Include="OrchardCore.Queries" Version="2.1.7" />
@@ -36,5 +33,9 @@
 		<PackageReference Include="OrchardCore.Search.AzureAI.Core" Version="2.1.7" />
 		<PackageReference Include="PropertyBrokersDigital.Email" Version="1.0.0" />
 		<PackageReference Include="PropertyBrokersDigital.Email.Graph" Version="1.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PropertyBrokers.OrchardCore.ContentTypeAdditions\PropertyBrokers.OrchardCore.EmailTemplating\PropertyBrokers.OrchardCore.EmailTemplating.csproj" />
 	</ItemGroup>
 </Project>
