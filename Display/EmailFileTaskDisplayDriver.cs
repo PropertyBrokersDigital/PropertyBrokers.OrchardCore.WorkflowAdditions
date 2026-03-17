@@ -1,8 +1,5 @@
-using OrchardCore.Email.Workflows.Activities;
-using OrchardCore.Email.Workflows.ViewModels;
 using OrchardCore.Workflows.Display;
 using OrchardCore.Workflows.Models;
-using OrchardCore.Email;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
 {
