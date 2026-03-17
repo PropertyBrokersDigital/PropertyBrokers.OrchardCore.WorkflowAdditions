@@ -6,7 +6,7 @@
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/PropertyBrokersDigital/PropertyBrokers.OrchardCore.WorkflowAdditions</RepositoryUrl>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -31,8 +31,8 @@
 		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.1.7" />
 		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.1.7" />
 		<PackageReference Include="OrchardCore.Search.AzureAI.Core" Version="2.1.7" />
-		<PackageReference Include="PropertyBrokersDigital.Email" Version="1.0.0" />
-		<PackageReference Include="PropertyBrokersDigital.Email.Graph" Version="1.0.0" />
+		<PackageReference Include="PropertyBrokersDigital.Email" Version="1.0.1" />
+    	<PackageReference Include="PropertyBrokersDigital.Email.Graph" Version="1.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>
