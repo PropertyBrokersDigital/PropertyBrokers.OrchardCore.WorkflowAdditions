@@ -36,7 +36,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
 
         public override void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<EmailSenderSettings>(_configuration.GetSection("EmailSettings:Workflows"));
+            services.Configure<EmailSenderSettings>("Workflows", _configuration.GetSection("EmailSettings:Workflows"));
             services.AddScoped<IEmailSender, GraphEmailSender>();
             services.AddActivity<ContentForEachTask, ContentForEachTaskDisplayDriver>();
             services.AddActivity<EmailFileTask, EmailFileTaskDisplayDriver>();

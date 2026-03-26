@@ -32,14 +32,14 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.EmailFile
             IWorkflowExpressionEvaluator expressionEvaluator,
             IStringLocalizer<EmailFileTask> localizer,
             HtmlEncoder htmlEncoder,
-            IOptions<EmailSenderSettings> emailSettings
+            IOptionsSnapshot<EmailSenderSettings> emailSettings
         )
         {
             _expressionEvaluator = expressionEvaluator;
             S = localizer;
             _htmlEncoder = htmlEncoder;
             _emailSender = emailSender;
-            _emailSettings = emailSettings.Value;
+            _emailSettings = emailSettings.Get("Workflows");
         }
 
         public override string Name => nameof(EmailFileTask);
