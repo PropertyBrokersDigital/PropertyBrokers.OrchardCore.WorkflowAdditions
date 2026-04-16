@@ -38,8 +38,13 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
         {
             services.Configure<EmailSenderSettings>("Workflows", _configuration.GetSection("EmailSettings:Workflows"));
             services.AddScoped<IEmailSender, GraphEmailSender>();
+            if (_configuration.GetSection("AzureAD:ClientSecret").Exists())
+            {
+                services.Configure<EmailSenderSettings>(_configuration.GetSection("EmailSettings:Workflows"));
+                services.AddScoped<IEmailSender, GraphEmailSender>();
+                services.AddActivity<EmailFileTask, EmailFileTaskDisplayDriver>();
+            }
             services.AddActivity<ContentForEachTask, ContentForEachTaskDisplayDriver>();
-            services.AddActivity<EmailFileTask, EmailFileTaskDisplayDriver>();
             services.AddActivity<UserForEachTask, UserForEachTaskDisplayDriver>();
             services.AddActivity<MediaCachePurgeTask, MediaPurgeTaskDisplayDriver>();
             services.AddActivity<ValidateJsonTask, ValidateJsonTaskDisplayDriver>();
