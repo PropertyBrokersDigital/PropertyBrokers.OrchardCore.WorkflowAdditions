@@ -26,6 +26,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.TaxonomyTerm
     {
         private const string CacheKeyPrefix = "WorkflowAdditions:TaxonomyTermIndex:";
         private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(15);
+        private static readonly Dictionary<string, ContentItem[]> EmptyIndex = new Dictionary<string, ContentItem[]>();
 
         private readonly GlobalMethod _getTaxonomyTerm;
         private readonly GlobalMethod _getInheritedTaxonomyTerms;
@@ -38,7 +39,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.TaxonomyTerm
                 Method = serviceProvider => (Func<string, string, object>)((taxonomyId, termId) =>
                 {
                     var index = GetIndex(serviceProvider, taxonomyId);
-                    if (index != null && termId != null && index.TryGetValue(termId, out var chain))
+                    if (termId != null && index.TryGetValue(termId, out var chain))
                     {
                         return chain[0];
                     }
@@ -55,7 +56,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.TaxonomyTerm
                 Method = serviceProvider => (Func<string, string, object>)((taxonomyId, termId) =>
                 {
                     var index = GetIndex(serviceProvider, taxonomyId);
-                    if (index != null && termId != null && index.TryGetValue(termId, out var chain))
+                    if (termId != null && index.TryGetValue(termId, out var chain))
                     {
                         return chain;
                     }
@@ -77,7 +78,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.TaxonomyTerm
         {
             if (string.IsNullOrEmpty(taxonomyId))
             {
-                return null;
+                return EmptyIndex;
             }
 
             var memoryCache = serviceProvider.GetRequiredService<IMemoryCache>();
