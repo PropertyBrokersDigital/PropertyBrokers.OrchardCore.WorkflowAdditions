@@ -21,6 +21,8 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.TaxonomyTerm;
+using OrchardCore.Scripting;
 
 namespace PropertyBrokers.OrchardCore.WorkflowAdditions
 {
@@ -56,6 +58,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<EnvironmentVariableTask, EnvironmentVariableTaskDisplayDriver>();
             services.AddActivity<AzureAISearchIndexTask, AzureAISearchIndexTaskDisplayDriver>();
 
+            services.AddScoped<IGlobalMethodProvider, TaxonomyGlobalMethodProvider>();
         }
 
         public override void Configure(IApplicationBuilder app, IEndpointRouteBuilder routes, IServiceProvider serviceProvider)
