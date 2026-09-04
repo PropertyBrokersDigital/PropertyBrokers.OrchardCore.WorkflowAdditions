@@ -19,18 +19,18 @@
 	<ItemGroup>
 		<PackageReference Include="NETCore.MailKit" Version="2.1.0" />
 		<PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
-		<PackageReference Include="OrchardCore.Module.Targets" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Contents" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Email" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Queries" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Users" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Workflows" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.ContentManagement" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Data.Abstractions" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.1.7" />
-		<PackageReference Include="OrchardCore.Search.AzureAI.Core" Version="2.1.7" />
+		<PackageReference Include="OrchardCore.Module.Targets" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Contents" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Email" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Queries" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Users" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Workflows" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.ContentManagement" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Data.Abstractions" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Search.AzureAI.Core" Version="2.2.1" />
 		<PackageReference Include="PropertyBrokersDigital.Email" Version="1.0.1" />
     	<PackageReference Include="PropertyBrokersDigital.Email.Graph" Version="1.1.3" />
 	</ItemGroup>
