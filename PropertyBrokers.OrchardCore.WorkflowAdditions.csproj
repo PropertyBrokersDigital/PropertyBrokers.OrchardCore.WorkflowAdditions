@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <PbTargetFramework Condition="'$(PbTargetFramework)' == ''">net8.0</PbTargetFramework>
+    <OrchardCoreVersion Condition="'$(OrchardCoreVersion)' == ''">2.2.1</OrchardCoreVersion>
+    <TargetFramework>$(PbTargetFramework)</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 	  <PackageId>PropertyBrokersDigital.OrchardCore.WorkflowAdditions</PackageId>
 	  <RepositoryType>git</RepositoryType>
@@ -19,18 +21,19 @@
 	<ItemGroup>
 		<PackageReference Include="NETCore.MailKit" Version="2.1.0" />
 		<PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
-		<PackageReference Include="OrchardCore.Module.Targets" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Contents" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Email" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Queries" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Users" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Workflows" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.ContentManagement" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Data.Abstractions" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.DisplayManagement" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Media.Abstractions" Version="2.2.1" />
-		<PackageReference Include="OrchardCore.Search.AzureAI.Core" Version="2.2.1" />
+		<PackageReference Include="OrchardCore.Module.Targets" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Contents" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Email" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Queries" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Users" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Workflows" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.ContentManagement" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Data.Abstractions" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Data.YesSql.Abstractions" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.DisplayManagement" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Media.Abstractions" Version="$(OrchardCoreVersion)" />
+		<PackageReference Include="OrchardCore.Search.AzureAI.Core" Version="$(OrchardCoreVersion)" Condition="'$(PbTargetFramework)' != 'net10.0'" />
+		<PackageReference Include="OrchardCore.AzureAI.Core" Version="$(OrchardCoreVersion)" Condition="'$(PbTargetFramework)' == 'net10.0'" />
 		<PackageReference Include="PropertyBrokersDigital.Email" Version="1.0.1" />
     	<PackageReference Include="PropertyBrokersDigital.Email.Graph" Version="1.1.3" />
 	</ItemGroup>
