@@ -58,7 +58,9 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddActivity<EnvironmentVariableTask, EnvironmentVariableTaskDisplayDriver>();
             services.AddActivity<AzureAISearchIndexTask, AzureAISearchIndexTaskDisplayDriver>();
 
-            services.AddScoped<IGlobalMethodProvider, TaxonomyGlobalMethodProvider>();
+            // Singleton: OrchardCore's IScriptingManager is a singleton over IEnumerable<IGlobalMethodProvider>.
+            // The provider holds no scoped state; its methods resolve services from the per-call provider.
+            services.AddSingleton<IGlobalMethodProvider, TaxonomyGlobalMethodProvider>();
         }
 
         public override void Configure(IApplicationBuilder app, IEndpointRouteBuilder routes, IServiceProvider serviceProvider)
