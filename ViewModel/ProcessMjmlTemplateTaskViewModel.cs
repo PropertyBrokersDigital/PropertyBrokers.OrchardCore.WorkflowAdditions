@@ -12,5 +12,6 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
         [Required]
         public string EmailTemplateContent { get; set; }
         public string MergeTagsContent { get; set; }
+        public bool ForwardSafeColumns { get; set; }
     }
 }
