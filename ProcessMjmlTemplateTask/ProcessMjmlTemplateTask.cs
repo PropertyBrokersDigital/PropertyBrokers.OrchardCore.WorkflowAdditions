@@ -45,6 +45,12 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
             set => SetProperty(value);
         }
 
+        public bool ForwardSafeColumns
+        {
+            get => GetProperty<bool>(() => false);
+            set => SetProperty(value);
+        }
+
         public override IEnumerable<Outcome> GetPossibleOutcomes(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
         {
             return Outcomes(S["Done"]);
@@ -58,7 +64,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.ProcessMjmlTemplate
 
             string mjmlTemplate = await _expressionEvaluator.EvaluateAsync(EmailTemplateContent, workflowContext, null);
 
-            var html = await _mjmlTemplateService.ProcessMjmlTemplateAsync(mjmlTemplate, mergeTags);
+            var html = await _mjmlTemplateService.ProcessMjmlTemplateAsync(mjmlTemplate, mergeTags, ForwardSafeColumns);
 
             workflowContext.Properties["ProcessMjmlTemplateTaskOutput"] = html;
             return Outcomes("Done");

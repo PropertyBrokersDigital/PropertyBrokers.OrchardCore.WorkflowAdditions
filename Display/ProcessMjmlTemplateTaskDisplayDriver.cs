@@ -15,12 +15,14 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.Display
         {
             model.EmailTemplateContent = activity.EmailTemplateContent.Expression;
             model.MergeTagsContent = activity.MergeTagsContent.Expression;
+            model.ForwardSafeColumns = activity.ForwardSafeColumns;
         }
 
         protected override void UpdateActivity(ProcessMjmlTemplateTaskViewModel model, ProcessMjmlTemplateTask activity)
         {
             activity.EmailTemplateContent = new WorkflowExpression<string>(model.EmailTemplateContent);
             activity.MergeTagsContent = new WorkflowExpression<string>(model.MergeTagsContent);
+            activity.ForwardSafeColumns = model.ForwardSafeColumns;
         }
     }
 }
