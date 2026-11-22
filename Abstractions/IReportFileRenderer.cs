@@ -15,8 +15,13 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.Abstractions
         /// </summary>
         /// <param name="reportContentItemId">The content item id of the report.</param>
         /// <param name="jsonData">A JSON object used as the report's data source.</param>
+        /// <param name="options">Who is asking; see <see cref="ReportFileRenderOptions"/>.</param>
         /// <param name="cancellationToken">Cancels the render.</param>
         /// <returns>The rendered file, or a failed result saying why it couldn't be rendered.</returns>
-        Task<ReportFileRenderResult> RenderAsync(string reportContentItemId, string jsonData, CancellationToken cancellationToken = default);
+        Task<ReportFileRenderResult> RenderAsync(
+            string reportContentItemId,
+            string jsonData,
+            ReportFileRenderOptions options,
+            CancellationToken cancellationToken = default);
     }
 }

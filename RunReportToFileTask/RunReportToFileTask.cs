@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,9 +26,13 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
     {
         public const string OutputPropertyName = "RunReportToFileTaskOutput";
 
+        /// <summary>The largest JSON data, in UTF-8 bytes, the task passes to the renderer.</summary>
+        public const int MaxJsonBytes = 5 * 1024 * 1024;
+
         private const string DoneOutcome = "Done";
         private const string FailedOutcome = "Failed";
         private const string PdfContentType = "application/pdf";
+        private const string PdfExtension = ".pdf";
 
         private readonly IMediaFileStore _mediaFileStore;
         private readonly IWorkflowExpressionEvaluator _expressionEvaluator;
@@ -93,26 +99,26 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
 
         public override async Task<ActivityExecutionResult> ExecuteAsync(WorkflowExecutionContext workflowContext, ActivityContext activityContext)
         {
-            var reportContentItemId = (await _expressionEvaluator.EvaluateAsync(ReportContentItemId, workflowContext, null))?.Trim();
-            var jsonData = await _expressionEvaluator.EvaluateAsync(JsonData, workflowContext, null);
-            var mediaPath = (await _expressionEvaluator.EvaluateAsync(MediaPath, workflowContext, null))?.Trim();
-            var fileName = (await _expressionEvaluator.EvaluateAsync(FileName, workflowContext, null))?.Trim();
-
-            var inputError = ValidateInputs(reportContentItemId, jsonData, mediaPath);
-            if (inputError != null)
-            {
-                return Fail(workflowContext, inputError);
-            }
-
-            var renderer = _serviceProvider.GetService<IReportFileRenderer>();
-            if (renderer == null)
-            {
-                return Fail(workflowContext, S["No report renderer is registered, so the report can't be run."].Value);
-            }
-
+            string reportContentItemId = null;
             try
             {
-                var rendered = await renderer.RenderAsync(reportContentItemId, jsonData);
+                // Inside the try so a Liquid error ends on Failed rather than faulting the workflow.
+                var inputs = await EvaluateInputsAsync(workflowContext);
+                reportContentItemId = inputs.ReportContentItemId;
+
+                var inputError = ValidateInputs(inputs);
+                if (inputError != null)
+                {
+                    return Fail(workflowContext, inputError);
+                }
+
+                var renderer = _serviceProvider.GetService<IReportFileRenderer>();
+                if (renderer == null)
+                {
+                    return Fail(workflowContext, S["No report renderer is registered, so the report can't be run."].Value);
+                }
+
+                var rendered = await renderer.RenderAsync(inputs.ReportContentItemId, inputs.JsonData, ReportFileRenderOptions.Workflow);
                 if (!rendered.Succeeded)
                 {
                     return Fail(workflowContext, S["The report couldn't be run: {0}", rendered.ErrorMessage].Value);
@@ -123,7 +129,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
                     return Fail(workflowContext, S["The report produced an empty file."].Value);
                 }
 
-                var savedPath = await SaveToMediaAsync(mediaPath, ResolveFileName(fileName, rendered), rendered.Content);
+                var fileName = ResolveFileName(inputs.FileName, rendered);
+                var savedPath = await SaveToMediaAsync(NormalizeMediaPath(inputs.MediaPath), fileName, rendered.Content);
 
                 workflowContext.LastResult = savedPath;
                 workflowContext.Properties[OutputPropertyName] = savedPath;
@@ -137,25 +144,90 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
             }
         }
 
-        private string ValidateInputs(string reportContentItemId, string jsonData, string mediaPath)
+        private async Task<TaskInputs> EvaluateInputsAsync(WorkflowExecutionContext workflowContext)
         {
-            if (string.IsNullOrWhiteSpace(reportContentItemId))
+            var reportContentItemId = await _expressionEvaluator.EvaluateAsync(ReportContentItemId, workflowContext, null);
+            var jsonData = await _expressionEvaluator.EvaluateAsync(JsonData, workflowContext, null);
+            var mediaPath = await _expressionEvaluator.EvaluateAsync(MediaPath, workflowContext, null);
+            var fileName = await _expressionEvaluator.EvaluateAsync(FileName, workflowContext, null);
+
+            return new TaskInputs(reportContentItemId?.Trim(), jsonData, mediaPath?.Trim(), fileName?.Trim());
+        }
+
+        private string ValidateInputs(TaskInputs inputs)
+        {
+            if (string.IsNullOrWhiteSpace(inputs.ReportContentItemId))
             {
                 return S["A report content item ID is required."].Value;
             }
 
-            if (string.IsNullOrWhiteSpace(mediaPath))
+            if (string.IsNullOrWhiteSpace(inputs.MediaPath))
             {
                 return S["A media path is required."].Value;
             }
 
-            if (!IsJsonObject(jsonData))
+            if (NormalizeMediaPath(inputs.MediaPath) == null)
+            {
+                return S["The media path must be a folder inside the media library: no leading /, no . or .. segments and no :."].Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(inputs.FileName) && !IsSafeFileName(inputs.FileName))
+            {
+                return S["The file name can't be . or .., contain :, or start with /."].Value;
+            }
+
+            if (inputs.JsonData != null && Encoding.UTF8.GetByteCount(inputs.JsonData) > MaxJsonBytes)
+            {
+                return S["The JSON data is larger than the 5 MB limit."].Value;
+            }
+
+            if (!IsJsonObject(inputs.JsonData))
             {
                 return S["The JSON data must be a JSON object."].Value;
             }
 
             return null;
         }
+
+        /// <summary>
+        /// The media path with \ turned into /, or null when it could leave the folder it names:
+        /// rooted, with a . or .. segment, or with a : (a drive or a scheme). The media store can be
+        /// Azure Blob, where prefix/../x may resolve outside the tenant's base path.
+        /// </summary>
+        private static string NormalizeMediaPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return null;
+            }
+
+            var normalized = path.Replace('\\', '/').Trim();
+            if (normalized.StartsWith('/') || normalized.Contains(':') || Path.IsPathRooted(normalized))
+            {
+                return null;
+            }
+
+            var segments = normalized.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            if (segments.Length == 0 || segments.Any(IsDotSegment))
+            {
+                return null;
+            }
+
+            return string.Join('/', segments);
+        }
+
+        private static bool IsSafeFileName(string fileName)
+        {
+            var normalized = fileName.Replace('\\', '/').Trim();
+            if (normalized.StartsWith('/') || normalized.Contains(':') || Path.IsPathRooted(normalized))
+            {
+                return false;
+            }
+
+            return !normalized.Split('/').Any(IsDotSegment);
+        }
+
+        private static bool IsDotSegment(string segment) => segment.Trim() is "." or "..";
 
         private static bool IsJsonObject(string json)
         {
@@ -177,11 +249,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
 
         private string ResolveFileName(string fileName, ReportFileRenderResult rendered)
         {
-            var name = string.IsNullOrWhiteSpace(fileName) ? rendered.FileName : fileName;
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = $"report-{DateTime.UtcNow:yyyyMMddHHmmss}";
-            }
+            var name = string.IsNullOrWhiteSpace(fileName) ? UniqueDefaultName(rendered.FileName) : fileName;
 
             var extension = ExtensionFor(rendered.ContentType);
             if (extension != null && !name.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
@@ -192,12 +260,30 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
             return _mediaNameNormalizerService.NormalizeFileName(name.Replace('/', ' ').Replace('\\', ' '));
         }
 
+        // "<report name> <yyyyMMdd-HHmmss> <8 hex>", so two runs never collide and a name can't be guessed from the date.
+        private static string UniqueDefaultName(string suggestedName)
+        {
+            var reportName = suggestedName ?? string.Empty;
+            if (reportName.EndsWith(PdfExtension, StringComparison.OrdinalIgnoreCase))
+            {
+                reportName = reportName[..^PdfExtension.Length];
+            }
+
+            reportName = reportName.Replace(':', ' ').Replace('/', ' ').Replace('\\', ' ').Trim();
+            if (reportName.Length == 0 || reportName.All(c => c == '.'))
+            {
+                reportName = "report";
+            }
+
+            return $"{reportName} {DateTime.UtcNow:yyyyMMdd-HHmmss} {Guid.NewGuid().ToString("N")[..8]}";
+        }
+
         private static string ExtensionFor(string contentType)
         {
             // Reports render to PDF; an unknown type keeps whatever extension the file name has.
             if (string.IsNullOrWhiteSpace(contentType) || string.Equals(contentType, PdfContentType, StringComparison.OrdinalIgnoreCase))
             {
-                return ".pdf";
+                return PdfExtension;
             }
 
             return null;
@@ -220,5 +306,7 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
             workflowContext.LastResult = message;
             return Outcomes(FailedOutcome);
         }
+
+        private sealed record TaskInputs(string ReportContentItemId, string JsonData, string MediaPath, string FileName);
     }
 }
