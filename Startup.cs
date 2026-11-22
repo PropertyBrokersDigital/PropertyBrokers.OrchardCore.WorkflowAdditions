@@ -19,6 +19,7 @@ using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken.Servi
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GenerateSecureUrlToken;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.GoogleAnalyticsEvent;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.SaveFileToMedia;
+using PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.EnvironmentVariable;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.AzureAISearchTask;
 using PropertyBrokers.OrchardCore.WorkflowAdditions.TaxonomyTerm;
@@ -55,6 +56,8 @@ namespace PropertyBrokers.OrchardCore.WorkflowAdditions
             services.AddScoped<ISecureUrlTokenService, SecureUrlTokenService>();
             services.AddActivity<GenerateSecureUrlTokenTask, GenerateSecureUrlTokenTaskDisplayDriver>();
             services.AddActivity<SaveFileToMediaTask, SaveFileToMediaTaskDisplayDriver>();
+            // Fails cleanly unless the host registers an IReportFileRenderer (the Portal's reporting module does).
+            services.AddActivity<RunReportToFileTask, RunReportToFileTaskDisplayDriver>();
             services.AddActivity<EnvironmentVariableTask, EnvironmentVariableTaskDisplayDriver>();
             services.AddActivity<AzureAISearchIndexTask, AzureAISearchIndexTaskDisplayDriver>();
 

@@ -1,0 +1,6 @@
+@model OrchardCore.Workflows.ViewModels.ActivityViewModel<PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile.RunReportToFileTask>
+
+<header>
+    <h4><i class="fa fa-file-pdf"></i>@Model.Activity.GetTitleOrDefault(() => T["Run report to file"])</h4>
+</header>
+<em>@Model.Activity.Name</em>

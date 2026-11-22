@@ -1,0 +1,58 @@
+@using PropertyBrokers.OrchardCore.WorkflowAdditions.RunReportToFile
+@model RunReportToFileTaskViewModel
+
+<fieldset class="form-group" asp-validation-class-for="ReportContentItemId">
+    <label asp-for="ReportContentItemId">@T["Report content item ID"]</label>
+    <input type="text" asp-for="ReportContentItemId" class="form-control code" />
+    <span asp-validation-for="ReportContentItemId"></span>
+    <span class="hint">@T["The content item ID of the report to run. With Liquid support."]</span>
+</fieldset>
+
+<fieldset class="form-group" asp-validation-class-for="JsonData">
+    <label asp-for="JsonData">@T["JSON data"]</label>
+    <textarea asp-for="JsonData" rows="8" class="form-control"></textarea>
+    <span asp-validation-for="JsonData"></span>
+    <span class="hint">@T["A JSON object the report is filled with, as its FormData data source; array properties also become data sources of their own. With Liquid support, for example:"] <code>{{ Workflow.Properties.FormJson | raw }}</code></span>
+</fieldset>
+
+<fieldset class="form-group" asp-validation-class-for="MediaPath">
+    <label asp-for="MediaPath">@T["Media path"]</label>
+    <input type="text" asp-for="MediaPath" class="form-control code" />
+    <span asp-validation-for="MediaPath"></span>
+    <span class="hint">@T["The media library folder to save the file in. With Liquid support."]</span>
+</fieldset>
+
+<fieldset class="form-group" asp-validation-class-for="FileName">
+    <label asp-for="FileName">@T["File name"]</label>
+    <input type="text" asp-for="FileName" class="form-control code" />
+    <span asp-validation-for="FileName"></span>
+    <span class="hint">@T["The name to save the file as. With Liquid support. Optional: defaults to the report's title; .pdf is added when missing."]</span>
+</fieldset>
+
+<div class="form-group">
+    <div class="form-check">
+        <input type="checkbox" class="form-check-input" asp-for="Overwrite" />
+        <label class="form-check-label" asp-for="Overwrite">@T["Overwrite an existing file"]</label>
+        <span class="hint dashed">@T["Replaces a file with the same name in that folder. Off by default, when a file with the same name ends on Failed."]</span>
+    </div>
+</div>
+
+<p class="hint">@T["On Done, the saved media path is the workflow's LastResult and is also in Workflow.Properties.RunReportToFileTaskOutput."]</p>
+
+<style asp-name="codemirror"></style>
+<script asp-name="codemirror" depends-on="admin" at="Foot"></script>
+<script asp-name="codemirror-mode-javascript" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-simple" at="Foot"></script>
+<script asp-name="codemirror-addon-mode-multiplex" at="Foot"></script>
+<script asp-src="~/OrchardCore.Liquid/codemirror/liquid.js" at="Foot"></script>
+
+<script at="Foot">
+    $(function () {
+        CodeMirror.fromTextArea(document.getElementById('@Html.IdFor(x => x.JsonData)'), {
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            mode: { name: "liquid" },
+        });
+    });
+</script>
